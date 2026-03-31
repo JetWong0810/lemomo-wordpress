@@ -1,0 +1,14 @@
+{
+  "name": "lemomo-theme",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "sass --watch src/scss/main.scss:assets/css/main.css --style=expanded --source-map && cp src/js/main.js assets/js/main.js",
+    "build": "sass src/scss/main.scss:assets/css/main.css --style=compressed --no-source-map && cp src/js/main.js assets/js/main.js",
+    "watch:scss": "sass --watch src/scss/main.scss:assets/css/main.css --style=expanded --source-map",
+    "watch:js": "npx chokidar-cli 'src/js/**/*.js' -c 'cp src/js/main.js assets/js/main.js'"
+  },
+  "devDependencies": {
+    "sass": "^1.70.0"
+  }
+}

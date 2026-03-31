@@ -1,0 +1,59 @@
+version: '3.9'
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: lemomo_db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: lemomo_wp
+      MYSQL_USER: lemomo
+      MYSQL_PASSWORD: lemomo123
+      MYSQL_ROOT_PASSWORD: root123
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - lemomo_net
+
+  wordpress:
+    image: wordpress:6.4-php8.2-apache
+    container_name: lemomo_wp
+    restart: unless-stopped
+    depends_on:
+      - db
+    ports:
+      - "8888:80"
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_NAME: lemomo_wp
+      WORDPRESS_DB_USER: lemomo
+      WORDPRESS_DB_PASSWORD: lemomo123
+      WORDPRESS_DEBUG: 1
+    volumes:
+      - ./wp-content:/var/www/html/wp-content
+      - wp_core:/var/www/html
+    networks:
+      - lemomo_net
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: lemomo_pma
+    restart: unless-stopped
+    depends_on:
+      - db
+    ports:
+      - "8889:80"
+    environment:
+      PMA_HOST: db
+      PMA_USER: lemomo
+      PMA_PASSWORD: lemomo123
+    networks:
+      - lemomo_net
+
+volumes:
+  db_data:
+  wp_core:
+
+networks:
+  lemomo_net:
+    driver: bridge

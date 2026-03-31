@@ -1,0 +1,12 @@
+node_modules/
+.DS_Store
+*.log
+.figma-cache/
+
+# WordPress default themes & plugins
+wp-content/themes/twenty*/
+wp-content/plugins/akismet/
+wp-content/plugins/hello.php
+
+# WordPress language files
+wp-content/languages/
