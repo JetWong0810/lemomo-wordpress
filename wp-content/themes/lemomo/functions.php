@@ -31,11 +31,12 @@ add_action('after_setup_theme', function () {
 
 // ─── Enqueue Assets ─────────────────────────────────────────────────────────
 add_action('wp_enqueue_scripts', function () {
-    $theme_ver = wp_get_theme()->get('Version');
+    $css_file = get_template_directory() . '/assets/css/main.css';
+    $css_ver  = file_exists($css_file) ? filemtime($css_file) : time();
 
     wp_enqueue_style(
         'lemomo-fonts',
-        'https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;500;600;700&family=Inter:wght@400;700&display=swap',
+        'https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;700&display=swap',
         [],
         null
     );
@@ -44,14 +45,17 @@ add_action('wp_enqueue_scripts', function () {
         'lemomo-style',
         get_template_directory_uri() . '/assets/css/main.css',
         ['lemomo-fonts'],
-        $theme_ver
+        $css_ver
     );
+
+    $js_file = get_template_directory() . '/assets/js/main.js';
+    $js_ver  = file_exists($js_file) ? filemtime($js_file) : time();
 
     wp_enqueue_script(
         'lemomo-main',
         get_template_directory_uri() . '/assets/js/main.js',
         [],
-        $theme_ver,
+        $js_ver,
         true
     );
 });

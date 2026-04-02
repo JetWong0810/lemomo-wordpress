@@ -35,6 +35,26 @@ services:
     networks:
       - lemomo_net
 
+  wpcli:
+    image: wordpress:cli-php8.2
+    container_name: lemomo_cli
+    depends_on:
+      - db
+      - wordpress
+    volumes:
+      - ./wp-content:/var/www/html/wp-content
+      - wp_core:/var/www/html
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_NAME: lemomo_wp
+      WORDPRESS_DB_USER: lemomo
+      WORDPRESS_DB_PASSWORD: lemomo123
+    networks:
+      - lemomo_net
+    user: "33:33"
+    entrypoint: wp
+    command: "--info"
+
   phpmyadmin:
     image: phpmyadmin:latest
     container_name: lemomo_pma

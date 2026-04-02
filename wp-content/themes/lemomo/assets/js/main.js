@@ -40,26 +40,41 @@ document.querySelectorAll('.video-player, .episode-card').forEach((el) => {
     if (!wrapper) return;
 
     const track = wrapper.querySelector('.testimonials__track');
-    const cards = Array.from(track.querySelectorAll('.testimonials__slide'));
+    const slides = Array.from(track.querySelectorAll('.testimonials__slide'));
     const prevBtn = document.querySelector('.testimonials__nav-btn--prev');
     const nextBtn = document.querySelector('.testimonials__nav-btn--next');
 
-    if (cards.length === 0) return;
+    if (slides.length === 0) return;
 
     let current = 0;
 
+    function isMobile() {
+        return window.innerWidth < 768;
+    }
+
     function getVisible() {
         if (window.innerWidth >= 1024) return 3;
-        if (window.innerWidth >= 640) return 2;
+        if (window.innerWidth >= 768) return 2;
         return 1;
     }
 
     function maxIndex() {
-        return Math.max(0, cards.length - getVisible());
+        return Math.max(0, slides.length - getVisible());
+    }
+
+    function scrollMobile(direction) {
+        const card = slides[0];
+        if (!card) return;
+        const distance = card.getBoundingClientRect().width + 20;
+        wrapper.scrollBy({ left: direction * distance, behavior: 'smooth' });
     }
 
     function update() {
-        const cardWidth = cards[0].getBoundingClientRect().width;
+        if (isMobile()) {
+            track.style.transform = '';
+            return;
+        }
+        const cardWidth = slides[0].getBoundingClientRect().width;
         const gap = 20;
         const offset = current * (cardWidth + gap);
         track.style.transform = `translateX(-${offset}px)`;
@@ -70,12 +85,14 @@ document.querySelectorAll('.video-player, .episode-card').forEach((el) => {
 
     if (prevBtn) {
         prevBtn.addEventListener('click', () => {
+            if (isMobile()) { scrollMobile(-1); return; }
             if (current > 0) { current--; update(); }
         });
     }
 
     if (nextBtn) {
         nextBtn.addEventListener('click', () => {
+            if (isMobile()) { scrollMobile(1); return; }
             if (current < maxIndex()) { current++; update(); }
         });
     }
@@ -86,4 +103,41 @@ document.querySelectorAll('.video-player, .episode-card').forEach((el) => {
     });
 
     update();
+})();
+
+// ─── Event Countdown Timer ──────────────────────────────────────────────────
+(function () {
+    const el = document.querySelector('.event-upcoming__countdown');
+    if (!el) return;
+
+    const target = el.dataset.target;
+    if (!target) return;
+
+    const deadline = new Date(target).getTime();
+    if (isNaN(deadline)) return;
+
+    function pad(n) { return String(n).padStart(2, '0'); }
+
+    function tick() {
+        const now = Date.now();
+        const diff = Math.max(0, deadline - now);
+
+        const totalSec = Math.floor(diff / 1000);
+        const hours = Math.floor(totalSec / 3600);
+        const minutes = Math.floor((totalSec % 3600) / 60);
+        const seconds = totalSec % 60;
+
+        const h = el.querySelector('[data-unit="hours"]');
+        const m = el.querySelector('[data-unit="minutes"]');
+        const s = el.querySelector('[data-unit="seconds"]');
+
+        if (h) h.textContent = pad(hours);
+        if (m) m.textContent = pad(minutes);
+        if (s) s.textContent = pad(seconds);
+
+        if (diff > 0) requestAnimationFrame(tick);
+    }
+
+    tick();
+    setInterval(tick, 1000);
 })();

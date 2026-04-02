@@ -237,6 +237,50 @@ ACF 字段组必须导出 JSON 到主题目录，实现版本管理和多人协�
 wp-content/themes/lemomo/acf-json/   ← JSON 文件自动读写目录
 ```
 
+## 响应式开发规范
+
+**所有页面必须同时适配 PC 和移动端。** 开发过程中每个组件/区块都要考虑以下断点：
+
+| 断点 | 宽度 | 说明 |
+|------|------|------|
+| Desktop | > 1100px | 默认样式（desktop-first） |
+| Tablet | ≤ 1100px | 中等屏幕过渡 |
+| Tablet Small | ≤ 1024px | 卡片/网格列数调整 |
+| Mobile | ≤ 768px | 单列布局、hamburger 菜单、触摸交互 |
+| Mobile Small | ≤ 480px | 进一步收紧 padding/font-size |
+
+### 移动端开发要点
+
+1. **布局**：多列 grid/flex 在 768px 下改为单列/堆叠，用 `order` 控制排列优先级
+2. **导航**：768px 下隐藏 `.site-nav` 和 `.btn-download`，显示 `.hamburger`（需 `margin-left: auto` 靠右）
+3. **交互**：轮播/滑动区域在移动端用 `overflow-x: scroll` + `scroll-snap-type: x mandatory` 原生滑动，JS 在 `< 768px` 时跳过 transform 动画
+4. **图片**：移动端缩小 `max-width`，用 `margin: 0 auto` 或父容器 `justify-content: center` 居中
+5. **间距**：移动端减小 `padding`/`gap`，避免区块过高占满整屏
+6. **文字**：使用 `clamp()` 做流式字号，移动端标题/描述居中对齐
+7. **隐藏装饰**：纯装饰元素（如 `.features__glow`）在 768px 下 `display: none` 避免溢出
+8. **测试**：每次修改后 `npm run build` 并在 Chrome DevTools 的 iPhone 6/7/8 Plus（414px）和 iPad（768px）模拟器中验证
+
+### 新增区块 SCSS 结构
+
+```scss
+// 1. 桌面端默认样式
+.new-section {
+  // ...
+}
+
+// 2. 在 Responsive 区域的各断点中追加移动端适配
+@media (max-width: 768px) {
+  .new-section {
+    // 单列、收紧间距、居中
+  }
+}
+@media (max-width: 480px) {
+  .new-section {
+    // 进一步微调
+  }
+}
+```
+
 ## 新增页面流程
 
 1. 创建 `page-{slug}.php` 模板文件
@@ -245,8 +289,10 @@ wp-content/themes/lemomo/acf-json/   ← JSON 文件自动读写目录
 4. 导出字段组 JSON 到 `acf-json/` 目录
 5. 将字段名补充到本文件「ACF 字段名速查」表格
 6. 在 `src/scss/main.scss` 追加该页面样式（Responsive 断点之前）
-7. 运行 `npm run build` 编译
-8. 勾选 `DEVELOPMENT.md` 对应任务项
+7. **同步编写移动端响应式样式**（参考上方断点规范）
+8. 运行 `npm run build` 编译
+9. **在 Chrome DevTools 中验证 PC + 移动端效果**
+10. 勾选 `DEVELOPMENT.md` 对应任务项
 
 ## 参考文档
 

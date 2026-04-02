@@ -8,6 +8,11 @@
 <body <?php body_class(); ?>>
 <?php wp_body_open(); ?>
 
+<?php
+$cta_text = get_field('header_cta_text', 'option') ?: 'Download App';
+$cta_link = get_field('header_cta_link', 'option') ?: '#';
+?>
+
 <header class="site-header">
     <div class="container site-header__inner">
         <a href="<?php echo esc_url(home_url('/')); ?>" class="site-logo">
@@ -24,12 +29,11 @@
                 'fallback_cb'    => false,
             ]);
             ?>
+            <a href="<?php echo esc_url($cta_link); ?>" class="btn-download btn-download--mobile">
+                <?php echo esc_html($cta_text); ?>
+            </a>
         </nav>
 
-        <?php
-        $cta_text = get_field('header_cta_text', 'option') ?: 'Download App';
-        $cta_link = get_field('header_cta_link', 'option') ?: '#';
-        ?>
         <a href="<?php echo esc_url($cta_link); ?>" class="btn-download">
             <?php echo esc_html($cta_text); ?>
         </a>

@@ -1,0 +1,16 @@
+<svg width="30" height="500" viewBox="0 0 30 500" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_71_1097)">
+<path d="M30 -2H0V498H30V-2Z" fill="url(#paint0_linear_71_1097)"/>
+</g>
+<defs>
+<linearGradient id="paint0_linear_71_1097" x1="127" y1="442" x2="-97" y2="54" gradientUnits="userSpaceOnUse">
+<stop stop-color="#AA3F92"/>
+<stop offset="0.03" stop-color="#AF3F8E"/>
+<stop offset="0.77" stop-color="#EC7A25"/>
+<stop offset="1" stop-color="#ECAD1F"/>
+</linearGradient>
+<clipPath id="clip0_71_1097">
+<rect width="30" height="500" fill="white"/>
+</clipPath>
+</defs>
+</svg>
