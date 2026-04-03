@@ -60,7 +60,7 @@ $gradient-footer-label: linear-gradient(90deg, #F37630 0%, #DF3889 100%);
 | Event | `page-event.php` | 待创建 |
 | FAQ | `page-faq.php` | 待创建 |
 | Blog 列表 | `archive.php` | 待创建 |
-| Blog 详情 | `single.php` | 待创建 |
+| Blog 详情 | `single.php` | 含 TOC / 分享 / 相关文章侧边栏 |
 
 ## Template Parts 结构
 
@@ -181,6 +181,15 @@ template-parts/
 .footer-contact-block / .footer-contact-icon / .footer-contact-label / .footer-contact-text
 .footer-download-label / .footer-badges / .footer-badge
 .container
+.blog-detail / .blog-detail__layout / .blog-detail__hero / .blog-detail__hero-img
+.blog-detail__sidebar / .blog-detail__toc / .blog-detail__toc-title / .blog-detail__toc-nav / .blog-detail__toc-link
+.blog-detail__share / .blog-detail__share-title / .blog-detail__share-icons / .blog-detail__share-icon
+.blog-detail__related / .blog-detail__related-title / .blog-detail__related-card
+.blog-detail__content / .blog-detail__meta / .blog-detail__meta-tag / .blog-detail__meta-date
+.blog-detail__title / .blog-detail__body
+.blog-detail__more / .blog-detail__more-bg / .blog-detail__more-inner / .blog-detail__more-title
+.blog-detail__more-grid / .blog-detail__more-card / .blog-detail__more-card-img / .blog-detail__more-card-tag
+.blog-detail__pagination / .blog-detail__pagination-num / .blog-detail__pagination-arrow
 ```
 
 ## SCSS 文件结构

@@ -88,6 +88,84 @@ if (function_exists('acf_add_options_page')) {
     ]);
 }
 
+// ─── ACF Field Groups (Code Registration) ───────────────────────────────────
+add_action('acf/include_fields', function () {
+    if (!function_exists('acf_add_local_field_group')) return;
+
+    acf_add_local_field_group([
+        'key'      => 'group_faq_page',
+        'title'    => 'FAQ Page Fields',
+        'fields'   => [
+            [
+                'key'   => 'field_faq_title',
+                'label' => 'FAQ 标题',
+                'name'  => 'faq_title',
+                'type'  => 'text',
+                'default_value' => 'Ada Pertanyaan?',
+            ],
+            [
+                'key'   => 'field_faq_search_placeholder',
+                'label' => '搜索占位文字',
+                'name'  => 'faq_search_placeholder',
+                'type'  => 'text',
+                'default_value' => 'Ada Pertanyaan?',
+            ],
+            [
+                'key'   => 'field_faq_categories',
+                'label' => 'FAQ 分类',
+                'name'  => 'faq_categories',
+                'type'  => 'repeater',
+                'layout' => 'block',
+                'sub_fields' => [
+                    [
+                        'key'   => 'field_faq_cat_name',
+                        'label' => '分类名称',
+                        'name'  => 'category_name',
+                        'type'  => 'text',
+                    ],
+                    [
+                        'key'   => 'field_faq_items',
+                        'label' => 'FAQ 项目',
+                        'name'  => 'faq_items',
+                        'type'  => 'repeater',
+                        'layout' => 'row',
+                        'sub_fields' => [
+                            [
+                                'key'   => 'field_faq_question',
+                                'label' => '问题',
+                                'name'  => 'question',
+                                'type'  => 'text',
+                            ],
+                            [
+                                'key'   => 'field_faq_answer',
+                                'label' => '回答',
+                                'name'  => 'answer',
+                                'type'  => 'textarea',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ],
+        'location' => [
+            [
+                [
+                    'param'    => 'page_template',
+                    'operator' => '==',
+                    'value'    => 'page-faq.php',
+                ],
+            ],
+        ],
+    ]);
+});
+
+// ─── Indonesian Date Helper ──────────────────────────────────────────────────
+function lemomo_date_id($post = null) {
+    $months = [1=>'Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+    $ts = get_the_time('U', $post);
+    return date('j', $ts) . ' ' . $months[(int)date('n', $ts)] . ' ' . date('Y', $ts);
+}
+
 // ─── External API Helper ─────────────────────────────────────────────────────
 require_once get_template_directory() . '/inc/api.php';
 
