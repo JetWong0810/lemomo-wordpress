@@ -3,6 +3,20 @@ node_modules/
 *.log
 .figma-cache/
 
+# 生产环境配置（含密码，不进 git）
+.env.prod
+.env
+
+# SSL 证书
+certbot/conf/
+certbot/www/
+
+# WordPress 上传文件（体积大，单独备份）
+wp-content/uploads/
+
+# SCSS 编译产物的 source map（生产不需要）
+assets/css/*.map
+
 # WordPress default themes & plugins
 wp-content/themes/twenty*/
 wp-content/plugins/akismet/

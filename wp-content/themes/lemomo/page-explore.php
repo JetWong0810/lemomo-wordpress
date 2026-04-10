@@ -13,30 +13,29 @@ $page_subtitle = $acf_active ? get_field('explore_subtitle') : '';
 $main_thumb    = $acf_active ? get_field('explore_main_thumbnail') : null;
 $main_video    = $acf_active ? get_field('explore_main_video_url') : '';
 
-$episodes = function_exists('lemomo_get_video_episodes') ? lemomo_get_video_episodes() : [];
+$ep_page     = max(1, isset($_GET['ep_page']) ? (int)$_GET['ep_page'] : 1);
+$ep_per_page = 12;
+
+// 总数由 app-api 列表接口的完整数组长度决定（接口无分页参数）
+$ep_total       = function_exists('lemomo_get_video_episodes_total') ? lemomo_get_video_episodes_total() : 0;
+$ep_total_pages = $ep_total > 0 ? (int)ceil($ep_total / $ep_per_page) : 1;
+$episodes       = function_exists('lemomo_get_video_episodes') ? lemomo_get_video_episodes($ep_page, $ep_per_page) : [];
 
 if (!$page_subtitle) {
     $page_subtitle = 'Jelajahi Lemomo melalui video panduan dan temukan cara mudah menikmati semua fiturnya.';
 }
 
 if (empty($episodes)) {
-    $demo_titles = [
-        'Tutorial: Download dan Daftar Akun Baru',
-        'Tutorial: Download dan Daftar Akun Baru',
-        'Tutorial: Download dan Daftar Akun Baru',
-        'Tutorial: Download dan Daftar Akun Baru',
-        'Tutorial: Download dan Daftar Akun Baru',
-        'Tutorial: Download dan Daftar Akun Baru',
-    ];
-    foreach ($demo_titles as $i => $t) {
+    for ($i = 0; $i < 6; $i++) {
         $episodes[] = [
-            'title'          => $t,
+            'title'          => 'Tutorial: Download dan Daftar Akun Baru',
             'thumbnail'      => $demo_thumb,
             'video_url'      => '#',
-            'episode_number' => $i + 2,
-            'view_count'     => '3,5K',
+            'episode_number' => $i + 1,
+            'view_count'     => '',
         ];
     }
+    $ep_total_pages = 1;
 }
 ?>
 
@@ -84,12 +83,18 @@ if (empty($episodes)) {
                          data-video="<?php echo esc_url($ep['video_url'] ?? ''); ?>"
                          role="button"
                          tabindex="0">
-                        <?php if (!empty($ep['thumbnail'])) : ?>
-                            <img src="<?php echo esc_url($ep['thumbnail']); ?>"
+                        <div class="episode-card__thumb-wrap">
+                            <img src="<?php echo esc_url($ep['thumbnail'] ?: $demo_thumb); ?>"
                                  alt="<?php echo esc_attr($ep['title'] ?? ''); ?>"
                                  class="episode-card__thumb"
                                  loading="lazy">
-                        <?php endif; ?>
+                            <span class="episode-card__play-btn" aria-hidden="true">
+                                <svg viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="22" cy="22" r="22" fill="rgba(0,0,0,0.45)"/>
+                                    <polygon points="17,13 35,22 17,31" fill="#ffffff"/>
+                                </svg>
+                            </span>
+                        </div>
                         <div class="episode-card__info">
                             <?php if (!empty($ep['title'])) : ?>
                                 <p class="episode-card__title"><?php echo esc_html($ep['title']); ?></p>
@@ -114,20 +119,51 @@ if (empty($episodes)) {
                 <?php endforeach; ?>
             </div>
 
+            <?php if ($ep_total_pages > 1) : ?>
             <div class="explore-pagination">
-                <button class="explore-pagination__btn" aria-label="Previous page" disabled>
+                <?php
+                $prev_url = $ep_page > 1
+                    ? add_query_arg('ep_page', $ep_page - 1)
+                    : '';
+                $next_url = $ep_page < $ep_total_pages
+                    ? add_query_arg('ep_page', $ep_page + 1)
+                    : '';
+                ?>
+
+                <?php if ($prev_url) : ?>
+                <a href="<?php echo esc_url($prev_url); ?>" class="explore-pagination__btn" aria-label="Previous page">
                     <svg viewBox="0 0 10 10"><polyline points="7 2 3 5 7 8"/></svg>
-                </button>
-                <button class="explore-pagination__btn explore-pagination__btn--active" aria-label="Page 1">
-                    <span>1</span>
-                </button>
-                <button class="explore-pagination__btn" aria-label="Page 2">
-                    <span>2</span>
-                </button>
-                <button class="explore-pagination__btn" aria-label="Next page">
+                </a>
+                <?php else : ?>
+                <span class="explore-pagination__btn" aria-disabled="true" style="opacity:.4;cursor:default;">
+                    <svg viewBox="0 0 10 10"><polyline points="7 2 3 5 7 8"/></svg>
+                </span>
+                <?php endif; ?>
+
+                <?php for ($p = 1; $p <= $ep_total_pages; $p++) : ?>
+                    <?php if ($p === $ep_page) : ?>
+                    <span class="explore-pagination__btn explore-pagination__btn--active" aria-label="Page <?php echo $p; ?>">
+                        <span><?php echo $p; ?></span>
+                    </span>
+                    <?php else : ?>
+                    <a href="<?php echo esc_url(add_query_arg('ep_page', $p)); ?>"
+                       class="explore-pagination__btn" aria-label="Page <?php echo $p; ?>">
+                        <span><?php echo $p; ?></span>
+                    </a>
+                    <?php endif; ?>
+                <?php endfor; ?>
+
+                <?php if ($next_url) : ?>
+                <a href="<?php echo esc_url($next_url); ?>" class="explore-pagination__btn" aria-label="Next page">
                     <svg viewBox="0 0 10 10"><polyline points="3 2 7 5 3 8"/></svg>
-                </button>
+                </a>
+                <?php else : ?>
+                <span class="explore-pagination__btn" aria-disabled="true" style="opacity:.4;cursor:default;">
+                    <svg viewBox="0 0 10 10"><polyline points="3 2 7 5 3 8"/></svg>
+                </span>
+                <?php endif; ?>
             </div>
+            <?php endif; ?>
         </div>
     </section>
     <?php endif; ?>

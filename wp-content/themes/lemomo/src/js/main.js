@@ -11,22 +11,26 @@
 })();
 
 // ─── Video Player ────────────────────────────────────────────────────────────
-document.querySelectorAll('.video-player, .episode-card').forEach((el) => {
+document.querySelectorAll('.video-player, .episode-card, .event-card--has-video').forEach((el) => {
     el.addEventListener('click', () => {
         const videoUrl = el.dataset.video;
         if (!videoUrl) return;
+
+        // 找到封面容器（episode-card 用 __thumb-wrap，event-card 也一样）
+        const wrap = el.querySelector('.episode-card__thumb-wrap, .event-card__thumb-wrap') || el;
 
         const iframe = document.createElement('iframe');
         iframe.src = videoUrl;
         iframe.allow = 'autoplay; fullscreen';
         iframe.allowFullscreen = true;
         iframe.style.cssText =
-            'position:absolute;top:0;left:0;width:100%;height:100%;border:0;';
+            'position:absolute;top:0;left:0;width:100%;height:100%;border:0;background:#000;';
 
-        el.style.position = 'relative';
-        el.style.paddingBottom = '56.25%';
-        el.innerHTML = '';
-        el.appendChild(iframe);
+        wrap.style.position = 'relative';
+        wrap.style.paddingBottom = '56.25%';
+        wrap.style.height = '0';
+        wrap.innerHTML = '';
+        wrap.appendChild(iframe);
     });
 
     el.addEventListener('keydown', (e) => {

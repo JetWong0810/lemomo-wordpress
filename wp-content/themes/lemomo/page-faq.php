@@ -11,81 +11,50 @@ $img_dir    = $theme_uri . '/assets/images';
 $page_title = $acf_active ? (get_field('faq_title') ?: 'Ada Pertanyaan?') : 'Ada Pertanyaan?';
 $search_placeholder = $acf_active ? (get_field('faq_search_placeholder') ?: 'Ada Pertanyaan?') : 'Ada Pertanyaan?';
 
-$categories = $acf_active ? get_field('faq_categories') : null;
+// 1. 优先从外部 API 拉取 FAQ 数据
+$categories = function_exists('lemomo_get_faq_articles') ? lemomo_get_faq_articles() : [];
 
+// 2. API 无数据时 fallback ACF
+if (empty($categories) && $acf_active) {
+    $acf_cats = get_field('faq_categories');
+    if ($acf_cats) {
+        foreach ($acf_cats as $cat) {
+            $items = [];
+            if (!empty($cat['faq_items'])) {
+                foreach ($cat['faq_items'] as $item) {
+                    $items[] = [
+                        'question'    => $item['question'] ?? '',
+                        'answer'      => $item['answer']   ?? '',
+                        'answer_html' => '',
+                    ];
+                }
+            }
+            $categories[] = [
+                'category_name' => $cat['category_name'] ?? '',
+                'faq_items'     => $items,
+            ];
+        }
+    }
+}
+
+// 3. 最终静态兜底
 if (empty($categories)) {
     $categories = [
         [
             'category_name' => 'Tentang Lemomo',
             'faq_items' => [
-                [
-                    'question' => 'Apa itu Lemomo?',
-                    'answer'   => 'Lemomo adalah platform e-commerce berbasis minat di Indonesia yang menghadirkan pengalaman belanja seru melalui konsep blind box, belanja interaktif, dan fitur titip jual 24 jam.',
-                ],
-                [
-                    'question' => 'Bagaimana cara membuat akun Lemomo?',
-                    'answer'   => 'Anda dapat membuat akun Lemomo dengan mengunduh aplikasi dari Google Play atau App Store, lalu mendaftar menggunakan nomor telepon atau email Anda.',
-                ],
-                [
-                    'question' => 'Apakah Lemomo aman digunakan?',
-                    'answer'   => 'Ya, Lemomo menggunakan sistem keamanan berlapis untuk melindungi data dan transaksi pengguna.',
-                ],
-                [
-                    'question' => 'Kenapa harga di Lemomo bisa lebih murah?',
-                    'answer'   => 'Lemomo bekerja sama langsung dengan brand dan supplier untuk memberikan harga terbaik kepada pengguna.',
-                ],
-                [
-                    'question' => 'Apa saya bisa belanja tanpa Blind Box?',
-                    'answer'   => 'Tentu! Lemomo menyediakan berbagai pilihan belanja selain blind box.',
-                ],
-                [
-                    'question' => 'Apakah ada reward harian?',
-                    'answer'   => 'Ya, Lemomo menyediakan berbagai reward harian yang bisa Anda klaim setiap hari.',
-                ],
-                [
-                    'question' => 'Lupa kata sandi?',
-                    'answer'   => 'Anda dapat mereset kata sandi melalui halaman login dengan memilih "Lupa Kata Sandi".',
-                ],
-                [
-                    'question' => 'Apakah kotak kejutan Lemomo itu perjudian?',
-                    'answer'   => 'Tidak, blind box Lemomo bukan perjudian. Setiap kotak berisi produk nyata dengan nilai yang setara atau lebih tinggi dari harga yang dibayar.',
-                ],
+                ['question' => 'Apa itu Lemomo?',                       'answer' => 'Lemomo adalah platform e-commerce berbasis minat di Indonesia yang menghadirkan pengalaman belanja seru melalui konsep blind box, belanja interaktif, dan fitur titip jual 24 jam.', 'answer_html' => ''],
+                ['question' => 'Bagaimana cara membuat akun Lemomo?',   'answer' => 'Anda dapat membuat akun Lemomo dengan mengunduh aplikasi dari Google Play atau App Store, lalu mendaftar menggunakan nomor telepon atau email Anda.',                         'answer_html' => ''],
+                ['question' => 'Apakah Lemomo aman digunakan?',         'answer' => 'Ya, Lemomo menggunakan sistem keamanan berlapis untuk melindungi data dan transaksi pengguna.',                                                                                  'answer_html' => ''],
+                ['question' => 'Kenapa harga di Lemomo bisa lebih murah?', 'answer' => 'Lemomo bekerja sama langsung dengan brand dan supplier untuk memberikan harga terbaik kepada pengguna.',                                                                      'answer_html' => ''],
+                ['question' => 'Lupa kata sandi?',                      'answer' => 'Anda dapat mereset kata sandi melalui halaman login dengan memilih "Lupa Kata Sandi".',                                                                                         'answer_html' => ''],
             ],
         ],
         [
-            'category_name' => 'Blind Box',
+            'category_name' => 'Transaksi',
             'faq_items' => [
-                [
-                    'question' => 'Apa itu Blind Box?',
-                    'answer'   => 'Blind Box adalah kotak kejutan berisi produk pilihan yang akan diungkap setelah pembelian.',
-                ],
-            ],
-        ],
-        [
-            'category_name' => 'Titip Jual',
-            'faq_items' => [
-                [
-                    'question' => 'Bagaimana cara titip jual?',
-                    'answer'   => 'Anda dapat menggunakan fitur Titip Jual di aplikasi Lemomo untuk menjual barang Anda.',
-                ],
-            ],
-        ],
-        [
-            'category_name' => 'Saldo & Top Up',
-            'faq_items' => [
-                [
-                    'question' => 'Bagaimana cara top up saldo?',
-                    'answer'   => 'Top up saldo bisa dilakukan melalui berbagai metode pembayaran di aplikasi Lemomo.',
-                ],
-            ],
-        ],
-        [
-            'category_name' => 'Kode Referral',
-            'faq_items' => [
-                [
-                    'question' => 'Bagaimana cara menggunakan kode referral?',
-                    'answer'   => 'Masukkan kode referral saat mendaftar untuk mendapatkan bonus spesial.',
-                ],
+                ['question' => 'Bagaimana cara top up saldo?',          'answer' => 'Top up saldo bisa dilakukan melalui berbagai metode pembayaran di aplikasi Lemomo.',      'answer_html' => ''],
+                ['question' => 'Kapan dana withdraw tiba?',             'answer' => 'Penarikan dana akan tiba dalam 24 jam setelah permintaan diajukan.',                      'answer_html' => ''],
             ],
         ],
     ];
@@ -152,7 +121,11 @@ if (empty($categories)) {
                                             </span>
                                         </button>
                                         <div class="faq-item__answer" <?php echo ($cat_index === 0 && $item_index === 0) ? '' : 'hidden'; ?>>
-                                            <p><?php echo esc_html($item['answer']); ?></p>
+                                            <?php if (!empty($item['answer_html'])) : ?>
+                                                <div class="faq-item__answer-body"><?php echo $item['answer_html']; // wp_kses_post already applied in api.php ?></div>
+                                            <?php else : ?>
+                                                <p><?php echo esc_html($item['answer']); ?></p>
+                                            <?php endif; ?>
                                         </div>
                                     </div>
                                 <?php endforeach; ?>
