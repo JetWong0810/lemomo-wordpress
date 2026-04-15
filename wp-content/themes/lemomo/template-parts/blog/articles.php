@@ -80,8 +80,11 @@ $grid_posts = array_slice($all_posts, 1);
                 $g_cat = !empty($g_cats) ? $g_cats[0]->name : '';
                 $g_thumb = get_the_post_thumbnail_url($gp->ID, 'medium_large');
                 $g_date = get_the_date('j', $gp->ID) . ' ' . $id_months[(int)get_the_date('n', $gp->ID) - 1] . ' ' . get_the_date('Y', $gp->ID);
+                $g_external = get_post_meta($gp->ID, '_lemomo_media_url', true);
+                $g_url = $g_external ? $g_external : get_permalink($gp->ID);
+                $g_target = $g_external ? ' target="_blank" rel="noopener noreferrer"' : '';
             ?>
-            <a href="<?php echo esc_url(get_permalink($gp->ID)); ?>" class="blog-card">
+            <a href="<?php echo esc_url($g_url); ?>" class="blog-card"<?php echo $g_target; ?>>
                 <div class="blog-card__img">
                     <?php if ($g_thumb) : ?>
                     <img src="<?php echo esc_url($g_thumb); ?>" alt="<?php echo esc_attr($gp->post_title); ?>">

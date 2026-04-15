@@ -179,24 +179,20 @@ add_action('init', function () {
     ]);
 });
 
-// 外链 URL meta 字段
+// 外链 URL meta 字段（lemomo_media + post 共用）
 add_action('add_meta_boxes', function () {
-    add_meta_box(
-        'lemomo_media_url',
-        '外链 URL',
-        function ($post) {
-            $url = get_post_meta($post->ID, '_lemomo_media_url', true);
-            wp_nonce_field('lemomo_media_url_nonce', 'lemomo_media_nonce');
-            echo '<p style="margin-bottom:6px;color:#666;">点击卡片跳转的目标地址（在新标签页打开）</p>';
-            echo '<input type="url" name="lemomo_media_url" value="' . esc_attr($url) . '" style="width:100%;padding:6px 8px;" placeholder="https://..." required>';
-        },
-        'lemomo_media',
-        'normal',
-        'high'
-    );
+    $render_meta_box = function ($post) {
+        $url = get_post_meta($post->ID, '_lemomo_media_url', true);
+        wp_nonce_field('lemomo_media_url_nonce', 'lemomo_media_nonce');
+        echo '<p style="margin-bottom:6px;color:#666;">点击卡片跳转的目标地址（在新标签页打开），留空则跳转详情页</p>';
+        echo '<input type="url" name="lemomo_media_url" value="' . esc_attr($url) . '" style="width:100%;padding:6px 8px;" placeholder="https://...">';
+    };
+
+    add_meta_box('lemomo_media_url', '外链 URL', $render_meta_box, 'lemomo_media', 'normal', 'high');
+    add_meta_box('lemomo_post_external_url', '外链 URL', $render_meta_box, 'post', 'normal', 'high');
 });
 
-add_action('save_post_lemomo_media', function ($post_id) {
+$save_external_url = function ($post_id) {
     if (!isset($_POST['lemomo_media_nonce'])) return;
     if (!wp_verify_nonce($_POST['lemomo_media_nonce'], 'lemomo_media_url_nonce')) return;
     if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) return;
@@ -204,7 +200,9 @@ add_action('save_post_lemomo_media', function ($post_id) {
 
     $url = isset($_POST['lemomo_media_url']) ? esc_url_raw($_POST['lemomo_media_url']) : '';
     update_post_meta($post_id, '_lemomo_media_url', $url);
-});
+};
+add_action('save_post_lemomo_media', $save_external_url);
+add_action('save_post_post', $save_external_url);
 
 // ─── Indonesian Date Helper ──────────────────────────────────────────────────
 function lemomo_date_id($post = null) {

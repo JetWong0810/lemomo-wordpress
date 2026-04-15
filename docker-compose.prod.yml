@@ -72,6 +72,28 @@ services:
         sleep 12h & wait $${!};
       done"
 
+  wpcli:
+    image: wordpress:cli-php8.2
+    container_name: lemomo_cli
+    depends_on:
+      - db
+      - wordpress
+    volumes:
+      - ./wp-content:/var/www/html/wp-content
+      - wp_core:/var/www/html
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_NAME: ${DB_NAME}
+      WORDPRESS_DB_USER: ${DB_USER}
+      WORDPRESS_DB_PASSWORD: ${DB_PASSWORD}
+    networks:
+      - lemomo_net
+    user: "33:33"
+    entrypoint: wp
+    command: "--info"
+    profiles:
+      - tools
+
 volumes:
   db_data:
   wp_core:
