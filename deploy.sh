@@ -185,7 +185,7 @@ ok "MySQL is ready."
 # Wait for WordPress
 info "Waiting for WordPress to be ready..."
 SECONDS_WAITED=0
-until docker exec lemomo_wp curl -sf http://localhost/ -o /dev/null 2>/dev/null; do
+until docker exec lemomo_wp wget -qO /dev/null http://localhost/ 2>/dev/null; do
     sleep 3
     SECONDS_WAITED=$((SECONDS_WAITED + 3))
     if [ "$SECONDS_WAITED" -ge 90 ]; then
@@ -267,6 +267,11 @@ if [ "$HAS_TABLES" = true ]; then
 fi
 
 if [ "$DO_IMPORT" = true ]; then
+    # Validate SQL file starts with valid SQL (not mysqldump warnings)
+    FIRST_CHAR=$(head -c 2 "$SQL_FILE")
+    if [[ "$FIRST_CHAR" != "--" ]] && [[ "$FIRST_CHAR" != "/*" ]] && [[ "$FIRST_CHAR" != "SE" ]] && [[ "$FIRST_CHAR" != "CR" ]] && [[ "$FIRST_CHAR" != "DR" ]]; then
+        err "SQL file appears invalid (may contain mysqldump warnings). Re-export with: docker exec lemomo_db mysqldump -u USER -pPASS DB_NAME 2>/dev/null > backup.sql"
+    fi
     info "Importing SQL dump..."
     docker cp "$SQL_FILE" lemomo_db:/tmp/import.sql
     docker exec lemomo_db sh -c "mysql -u '$DB_USER' -p'$DB_PASSWORD' '$DB_NAME' < /tmp/import.sql"
