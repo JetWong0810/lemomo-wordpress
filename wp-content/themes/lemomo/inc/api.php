@@ -5,11 +5,11 @@ defined('ABSPATH') || exit;
  * Lemomo API 辅助函数
  *
  * 所有接口均为公开接口，无需 token。
- * App API Base：http://49.232.128.174:48082
+ * App API Base：https://lemomo.id
  */
 
 // ─── 常量 ─────────────────────────────────────────────────────────────────────
-define('LEMOMO_APP_API_BASE',    'http://49.232.128.174:48082');
+define('LEMOMO_APP_API_BASE',    'https://lemomo.id');
 define('LEMOMO_LESSON_TYPE_TUTORIAL', 0);   // 新手教程（Explore 视频）
 define('LEMOMO_LESSON_TYPE_NEWS',     1);   // 官网新闻
 define('LEMOMO_LESSON_TYPE_OFFLINE', 11);   // 线下活动
@@ -27,6 +27,27 @@ function lemomo_safe_pic_url(string $url): string {
     return $url;
 }
 
+// ─── API 域名白名单（?api_base= 参数切换，仅限管理员） ────────────────────────
+define('LEMOMO_API_BASE_MAP', [
+    'prod'  => 'https://lemomo.id',
+    'test'  => 'http://49.232.128.174:48082',
+]);
+
+function lemomo_get_api_base(): string {
+    if (
+        current_user_can('manage_options')
+        && !empty($_GET['api_base'])
+        && isset(LEMOMO_API_BASE_MAP[$_GET['api_base']])
+    ) {
+        return LEMOMO_API_BASE_MAP[$_GET['api_base']];
+    }
+    return rtrim(get_field('api_app_base_url', 'option') ?: LEMOMO_APP_API_BASE, '/');
+}
+
+function lemomo_is_debug_api(): bool {
+    return current_user_can('manage_options') && !empty($_GET['api_base']);
+}
+
 // ─── 通用请求 ─────────────────────────────────────────────────────────────────
 
 /**
@@ -37,7 +58,7 @@ function lemomo_safe_pic_url(string $url): string {
  * @return array            完整响应体
  */
 function lemomo_app_api_request(string $endpoint, array $query = []): array {
-    $base = rtrim(get_field('api_app_base_url', 'option') ?: LEMOMO_APP_API_BASE, '/');
+    $base = lemomo_get_api_base();
     $url  = $base . '/' . ltrim($endpoint, '/');
     if (!empty($query)) {
         $url = add_query_arg(array_map('strval', $query), $url);
@@ -59,38 +80,27 @@ function lemomo_app_api_request(string $endpoint, array $query = []): array {
 // ═══════════════════════════════════════════════════════════════════════════════
 
 /**
- * 获取指定 type 的 lesson 列表（Transient 缓存 1h）。
+ * 获取指定 type 的 lesson 列表（实时请求，无缓存）。
  * 返回 [{id, type, title, picUrl}, ...]
  */
 function lemomo_get_lessons_list(int $type): array {
-    $key    = "lemomo_app_list_{$type}";
-    $cached = get_transient($key);
-    if ($cached !== false) return $cached;
-
     $resp = lemomo_app_api_request("app-api/activity/lesson/list/{$type}");
     $list = $resp['data'] ?? [];
     if (!is_array($list)) $list = [];
 
-    $list = array_map(function (array $item): array {
+    return array_map(function (array $item): array {
         if (isset($item['picUrl'])) {
             $item['picUrl'] = lemomo_safe_pic_url($item['picUrl']);
         }
         return $item;
     }, $list);
-
-    set_transient($key, $list, HOUR_IN_SECONDS);
-    return $list;
 }
 
 /**
- * 获取单条 lesson 详情（含视频 URL），Transient 缓存 1h。
+ * 获取单条 lesson 详情（含视频 URL），实时请求，无缓存。
  * 返回 {id, title, picUrl, message, url}
  */
 function lemomo_get_lesson_detail(int $id): array {
-    $key    = "lemomo_app_detail_{$id}";
-    $cached = get_transient($key);
-    if ($cached !== false) return $cached;
-
     $resp = lemomo_app_api_request("app-api/activity/lesson/list/{$id}/get");
     $item = $resp['data'] ?? [];
     if (!is_array($item) || empty($item)) return [];
@@ -99,7 +109,6 @@ function lemomo_get_lesson_detail(int $id): array {
         $item['picUrl'] = lemomo_safe_pic_url($item['picUrl']);
     }
 
-    set_transient($key, $item, HOUR_IN_SECONDS);
     return $item;
 }
 
@@ -153,34 +162,14 @@ function lemomo_get_offline_events(): array {
 // ═══════════════════════════════════════════════════════════════════════════════
 
 /**
- * 已知分类 ID → 名称映射（当公开分类接口不可用时的内置 fallback）。
- * 可在此处按实际情况修改为印尼语名称。
- */
-function lemomo_faq_category_fallback(): array {
-    return [
-        6  => 'Transaksi',
-        7  => 'Pengembalian',
-        8  => 'Akun',
-        13 => 'Lainnya',
-        14 => 'Umum',
-        15 => 'Umum',
-    ];
-}
-
-/**
- * 拉取 FAQ 文章分类名称映射，返回 [id => name]（缓存 12h）。
- * 优先调用公开接口，失败时使用内置 fallback。
+ * 拉取 FAQ 文章分类名称映射，返回 [id => name]（实时请求，无缓存）。
  */
 function lemomo_get_faq_categories(): array {
-    $cached = get_transient('lemomo_faq_categories');
-    if ($cached !== false) return $cached;
-
-    $resp = lemomo_app_api_request('app-api/promotion/article-category/list-all-simple');
+    $resp = lemomo_app_api_request('app-api/promotion/article-category/list');
     $list = $resp['data'] ?? [];
+    $map  = [];
 
-    $map = lemomo_faq_category_fallback();
-
-    if (is_array($list) && !empty($list)) {
+    if (is_array($list)) {
         foreach ($list as $cat) {
             if (!empty($cat['id'])) {
                 $map[(int)$cat['id']] = $cat['name'] ?? '';
@@ -188,21 +177,17 @@ function lemomo_get_faq_categories(): array {
         }
     }
 
-    set_transient('lemomo_faq_categories', $map, 12 * HOUR_IN_SECONDS);
     return $map;
 }
 
 /**
- * 拉取 FAQ 文章列表，按分类分组（Transient 缓存 1h）。
+ * 拉取 FAQ 文章列表，按分类分组（实时请求，无缓存）。
  *
  * 接口：GET /app-api/promotion/article/page?status=0（无需 token）
  *
  * 返回：[['category_id', 'category_name', 'faq_items' => [['question','answer','answer_html']]], ...]
  */
 function lemomo_get_faq_articles(): array {
-    $cached = get_transient('lemomo_faq_articles');
-    if ($cached !== false) return $cached;
-
     $resp     = lemomo_app_api_request('app-api/promotion/article/page', ['status' => 0, 'pageNo' => 1, 'pageSize' => 200]);
     $articles = $resp['data']['list'] ?? [];
 
@@ -236,23 +221,11 @@ function lemomo_get_faq_articles(): array {
     }
 
     $result = array_values($grouped);
-    set_transient('lemomo_faq_articles', $result, HOUR_IN_SECONDS);
     return $result;
 }
 
-// ─── 缓存清理 ─────────────────────────────────────────────────────────────────
+// ─── 缓存清理（已移除 Transient 缓存，保留函数供 AJAX hook 兼容） ────────────
 
-/**
- * 清除所有 Lemomo API 相关 Transient 缓存。
- */
 function lemomo_clear_api_cache(): void {
-    delete_transient('lemomo_faq_categories');
-    delete_transient('lemomo_faq_articles');
-
-    global $wpdb;
-    $wpdb->query(
-        "DELETE FROM {$wpdb->options}
-         WHERE option_name LIKE '_transient_lemomo_app_%'
-            OR option_name LIKE '_transient_timeout_lemomo_app_%'"
-    );
+    // no-op: Transient 缓存已移除，API 数据实时获取
 }

@@ -7,14 +7,13 @@ $desc  = get_field('about_hero_desc') ?: 'Lemomo adalah platform e-commerce berb
 <section class="about-hero">
     <div class="about-hero__bg">
         <div class="about-hero__bg-gradient"></div>
-        <img src="<?php echo esc_url($img_dir . '/hero-bg-texture-56586a.png'); ?>" alt="" class="about-hero__bg-texture" aria-hidden="true">
+        <?php lemomo_picture($img_dir . '/hero-bg-texture-56586a.png', '', 'about-hero__bg-texture', 'aria-hidden="true"'); ?>
         <img src="<?php echo esc_url($img_dir . '/about-hero-overlay.svg'); ?>" alt="" class="about-hero__bg-overlay" aria-hidden="true">
     </div>
 
     <div class="about-hero__inner">
         <div class="about-hero__media">
-            <img src="<?php echo esc_url($img_dir . '/about-hero-phone-56586a.png'); ?>"
-                 alt="Lemomo App" class="about-hero__img">
+            <?php lemomo_picture($img_dir . '/about-hero-phone-56586a.png', 'Lemomo App', 'about-hero__img'); ?>
         </div>
 
         <div class="about-hero__content">

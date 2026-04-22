@@ -8,10 +8,10 @@ $img_dir = get_template_directory_uri() . '/assets/images';
             <h2 class="about-media__title">Liputan Media</h2>
             <p class="about-media__desc">Kumpulan media nasional yang meliputi Lemomo</p>
         </div>
-        <a href="#" class="about-media__link">
+        <!-- <a href="#" class="about-media__link">
             Lihat Selengkapnya
-            <img src="<?php echo esc_url($img_dir . '/about-arrow-right.svg'); ?>" alt="" aria-hidden="true">
-        </a>
+            <img src="<?php // echo esc_url($img_dir . '/about-arrow-right.svg'); ?>" alt="" aria-hidden="true">
+        </a> -->
     </div>
 
     <div class="about-media__marquee">

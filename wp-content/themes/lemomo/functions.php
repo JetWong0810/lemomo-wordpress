@@ -1,15 +1,17 @@
 <?php
 defined('ABSPATH') || exit;
 
-// ─── ACF Fallback ────────────────────────────────────────────────────────────
-if (!function_exists('get_field')) {
-    function get_field($selector, $post_id = false) { return null; }
-}
-if (!function_exists('the_field')) {
-    function the_field($selector, $post_id = false) {}
-}
-if (!function_exists('have_rows')) {
-    function have_rows($selector, $post_id = false) { return false; }
+// ─── ACF Fallback（仅当 ACF 插件不存在时才注册 stub）─────────────────────────
+if (!file_exists(WP_PLUGIN_DIR . '/advanced-custom-fields/acf.php')) {
+    if (!function_exists('get_field')) {
+        function get_field($selector, $post_id = false) { return null; }
+    }
+    if (!function_exists('the_field')) {
+        function the_field($selector, $post_id = false) {}
+    }
+    if (!function_exists('have_rows')) {
+        function have_rows($selector, $post_id = false) { return false; }
+    }
 }
 
 // ─── Theme Setup ────────────────────────────────────────────────────────────
@@ -204,6 +206,12 @@ $save_external_url = function ($post_id) {
 add_action('save_post_lemomo_media', $save_external_url);
 add_action('save_post_post', $save_external_url);
 
+// ─── Page ID by Slug Helper ─────────────────────────────────────────────────
+function lemomo_get_page_id_by_slug($slug) {
+    $page = get_page_by_path($slug);
+    return $page ? $page->ID : 0;
+}
+
 // ─── Indonesian Date Helper ──────────────────────────────────────────────────
 function lemomo_date_id($post = null) {
     $months = [1=>'Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
@@ -211,8 +219,71 @@ function lemomo_date_id($post = null) {
     return date('j', $ts) . ' ' . $months[(int)date('n', $ts)] . ' ' . date('Y', $ts);
 }
 
+// ─── WebP Picture Helper ────────────────────────────────────────────────────
+function lemomo_picture($src, $alt = '', $class = '', $attrs = '') {
+    $webp = preg_replace('/\.(png|jpe?g)$/i', '.webp', $src);
+    $type = preg_match('/\.jpe?g$/i', $src) ? 'image/jpeg' : 'image/png';
+    $cls  = $class ? ' class="' . esc_attr($class) . '"' : '';
+    echo '<picture>';
+    echo '<source srcset="' . esc_url($webp) . '" type="image/webp">';
+    echo '<img src="' . esc_url($src) . '" alt="' . esc_attr($alt) . '"' . $cls . ' ' . $attrs . '>';
+    echo '</picture>';
+}
+
 // ─── External API Helper ─────────────────────────────────────────────────────
 require_once get_template_directory() . '/inc/api.php';
+
+// ─── ACF Event Page Fields ──────────────────────────────────────────────────
+add_action('acf/include_fields', function () {
+    if (!function_exists('acf_add_local_field_group')) return;
+
+    acf_add_local_field_group([
+        'key'    => 'group_event_page',
+        'title'  => 'Event Page Settings',
+        'fields' => [
+            [
+                'key'          => 'field_event_next_title',
+                'label'        => '标题',
+                'name'         => 'event_next_title',
+                'type'         => 'text',
+                'default_value'=> 'Event Selanjutnya',
+            ],
+            [
+                'key'          => 'field_event_next_subtitle',
+                'label'        => '副标题',
+                'name'         => 'event_next_subtitle',
+                'type'         => 'text',
+                'default_value'=> 'Nantikan keseruan event Lemomo selanjutnya',
+            ],
+            [
+                'key'          => 'field_event_next_label',
+                'label'        => 'Banner 标签',
+                'name'         => 'event_next_label',
+                'type'         => 'text',
+                'default_value'=> 'Hide and Show Event',
+            ],
+            [
+                'key'           => 'field_event_countdown_datetime',
+                'label'         => '倒计时目标时间',
+                'name'          => 'event_countdown_datetime',
+                'type'          => 'date_time_picker',
+                'display_format'=> 'Y-m-d H:i:s',
+                'return_format' => 'Y-m-d H:i:s',
+                'first_day'     => 1,
+                'instructions'  => '设置倒计时截止时间。留空则自动生成随机倒计时。',
+            ],
+        ],
+        'location' => [
+            [
+                [
+                    'param'    => 'page',
+                    'operator' => '==',
+                    'value'    => lemomo_get_page_id_by_slug('event'),
+                ],
+            ],
+        ],
+    ]);
+});
 
 // ─── ACF API Settings Fields ─────────────────────────────────────────────────
 add_action('acf/include_fields', function () {
@@ -227,8 +298,8 @@ add_action('acf/include_fields', function () {
                 'label'         => 'App API 域名',
                 'name'          => 'api_app_base_url',
                 'type'          => 'text',
-                'default_value' => 'http://49.232.128.174:48082',
-                'placeholder'   => 'http://49.232.128.174:48082',
+                'default_value' => 'https://lemomo.id',
+                'placeholder'   => 'https://lemomo.id',
                 'instructions'  => '所有接口均为公开接口，无需登录。不含末尾斜线。',
             ],
         ],
@@ -257,3 +328,69 @@ add_action('wp_ajax_refresh_video_cache', function () {
     lemomo_clear_api_cache();
     wp_send_json_success('缓存已刷新');
 });
+
+// ─── CPT: 表单提交（lemomo_inquiry）─────────────────────────────────────────
+add_action('init', function () {
+    register_post_type('lemomo_inquiry', [
+        'labels' => [
+            'name'          => '表单提交',
+            'singular_name' => '表单提交',
+            'all_items'     => '所有提交',
+            'menu_name'     => '表单提交',
+        ],
+        'public'       => false,
+        'show_ui'      => true,
+        'show_in_menu' => true,
+        'menu_icon'    => 'dashicons-email-alt',
+        'supports'     => ['title'],
+        'capabilities' => [
+            'create_posts' => 'do_not_allow',
+        ],
+        'map_meta_cap' => true,
+    ]);
+});
+
+add_filter('manage_lemomo_inquiry_posts_columns', function ($cols) {
+    $new = ['cb' => $cols['cb']];
+    $new['title']   = 'Nama';
+    $new['email']   = 'Email';
+    $new['phone']   = 'Telepon';
+    $new['date']    = $cols['date'];
+    return $new;
+});
+
+add_action('manage_lemomo_inquiry_posts_custom_column', function ($col, $id) {
+    if ($col === 'email') echo esc_html(get_post_meta($id, '_inquiry_email', true));
+    if ($col === 'phone') echo esc_html(get_post_meta($id, '_inquiry_phone', true));
+}, 10, 2);
+
+// ─── AJAX: Contact form submit ──────────────────────────────────────────────
+add_action('wp_ajax_lemomo_contact_submit', 'lemomo_handle_contact_submit');
+add_action('wp_ajax_nopriv_lemomo_contact_submit', 'lemomo_handle_contact_submit');
+
+function lemomo_handle_contact_submit() {
+    check_ajax_referer('lemomo_contact_form', 'nonce');
+
+    $name  = sanitize_text_field($_POST['name'] ?? '');
+    $email = sanitize_email($_POST['email'] ?? '');
+    $phone = sanitize_text_field($_POST['phone'] ?? '');
+
+    if (!$name || !$email || !$phone) {
+        wp_send_json_error('Semua kolom wajib diisi.', 400);
+    }
+
+    $post_id = wp_insert_post([
+        'post_type'   => 'lemomo_inquiry',
+        'post_title'  => $name,
+        'post_status' => 'publish',
+    ]);
+
+    if (is_wp_error($post_id)) {
+        wp_send_json_error('Gagal menyimpan.', 500);
+    }
+
+    update_post_meta($post_id, '_inquiry_email', $email);
+    update_post_meta($post_id, '_inquiry_phone', $phone);
+
+    wp_send_json_success('Terima kasih! Data Anda telah terkirim.');
+}

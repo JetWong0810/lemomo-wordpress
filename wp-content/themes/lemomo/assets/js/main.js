@@ -10,103 +10,191 @@
     });
 })();
 
-// ─── Video Player ────────────────────────────────────────────────────────────
-document.querySelectorAll('.video-player, .episode-card, .event-card--has-video').forEach((el) => {
-    el.addEventListener('click', () => {
-        const videoUrl = el.dataset.video;
-        if (!videoUrl) return;
+// ─── Features Tab Switching ───────────────────────────────────────────────
+(function () {
+    const tabs = document.querySelectorAll('[data-features-tab]');
+    if (!tabs.length) return;
 
-        // 找到封面容器（episode-card 用 __thumb-wrap，event-card 也一样）
-        const wrap = el.querySelector('.episode-card__thumb-wrap, .event-card__thumb-wrap') || el;
+    const imgs = document.querySelectorAll('[data-features-img]');
+    const texts = document.querySelectorAll('[data-features-text]');
 
-        const iframe = document.createElement('iframe');
-        iframe.src = videoUrl;
-        iframe.allow = 'autoplay; fullscreen';
-        iframe.allowFullscreen = true;
-        iframe.style.cssText =
-            'position:absolute;top:0;left:0;width:100%;height:100%;border:0;background:#000;';
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            const idx = tab.dataset.featuresTab;
 
-        wrap.style.position = 'relative';
-        wrap.style.paddingBottom = '56.25%';
-        wrap.style.height = '0';
-        wrap.innerHTML = '';
-        wrap.appendChild(iframe);
+            tabs.forEach(t => {
+                t.classList.remove('features__tab--active');
+                const accent = t.querySelector('.features__tab-accent');
+                if (accent) accent.remove();
+            });
+            tab.classList.add('features__tab--active');
+            if (!tab.querySelector('.features__tab-accent')) {
+                const accent = document.createElement('span');
+                accent.className = 'features__tab-accent';
+                tab.prepend(accent);
+            }
+
+            imgs.forEach(img => {
+                img.classList.toggle('features__media-img--active', img.dataset.featuresImg === idx);
+            });
+            texts.forEach(text => {
+                text.classList.toggle('features__text-content--active', text.dataset.featuresText === idx);
+            });
+        });
     });
+})();
 
-    el.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') el.click();
+// ─── Explore Page: Main Player + Episode Cards ─────────────────────────────
+(function () {
+    const player = document.getElementById('explorePlayer');
+    if (player) {
+        const container = player.querySelector('.explore-player__container');
+
+        function playVideo(url, thumb) {
+            const video = document.createElement('video');
+            video.src = url;
+            video.autoplay = true;
+            video.muted = true;
+            video.controls = true;
+            video.playsInline = true;
+            video.className = 'explore-player__video';
+            container.innerHTML = '';
+            container.appendChild(video);
+
+            player.dataset.video = url;
+            player.dataset.thumb = thumb;
+
+            video.addEventListener('ended', showThumb);
+        }
+
+        function showThumb() {
+            container.innerHTML =
+                '<img src="' + player.dataset.thumb + '" alt="Explore Lemomo" class="explore-player__thumb">' +
+                '<span class="explore-player__play-btn" aria-hidden="true">&#9654; PLAY</span>';
+        }
+
+        container.addEventListener('click', () => {
+            if (container.querySelector('video')) return;
+            const url = player.dataset.video;
+            if (url && url !== '#') playVideo(url, player.dataset.thumb);
+        });
+
+        document.querySelectorAll('.episode-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const url = card.dataset.video;
+                const thumb = card.querySelector('.episode-card__thumb')?.src || player.dataset.thumb;
+                if (!url || url === '#') return;
+                playVideo(url, thumb);
+                player.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            });
+            card.addEventListener('keydown', e => {
+                if (e.key === 'Enter' || e.key === ' ') card.click();
+            });
+        });
+
+        // Auto-play first episode on page load
+        const firstUrl = player.dataset.video;
+        if (firstUrl && firstUrl !== '#') {
+            playVideo(firstUrl, player.dataset.thumb);
+        }
+
+        // Pause/resume based on viewport visibility
+        let wasPlaying = false;
+
+        new IntersectionObserver(entries => {
+            const video = container.querySelector('video');
+            if (!video) return;
+            if (entries[0].isIntersecting) {
+                if (wasPlaying) video.play();
+            } else {
+                wasPlaying = !video.paused;
+                video.pause();
+            }
+        }, { threshold: 0.3 }).observe(player);
+
+        return;
+    }
+
+    // Fallback: other pages with .video-player or .event-card--has-video
+    document.querySelectorAll('.video-player, .event-card--has-video').forEach((el) => {
+        el.addEventListener('click', () => {
+            const videoUrl = el.dataset.video;
+            if (!videoUrl) return;
+
+            const wrap = el.querySelector('.event-card__thumb-wrap') || el;
+
+            const iframe = document.createElement('iframe');
+            iframe.src = videoUrl;
+            iframe.allow = 'autoplay; fullscreen';
+            iframe.allowFullscreen = true;
+            iframe.style.cssText =
+                'position:absolute;top:0;left:0;width:100%;height:100%;border:0;background:#000;';
+
+            wrap.style.position = 'relative';
+            wrap.style.paddingBottom = '56.25%';
+            wrap.style.height = '0';
+            wrap.innerHTML = '';
+            wrap.appendChild(iframe);
+        });
+
+        el.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') el.click();
+        });
     });
-});
+})();
 
-// ─── Testimonials Carousel ───────────────────────────────────────────────────
+// ─── Blog Featured Carousel (infinite seamless scroll) ────────────────────
+(function () {
+    const wrapper = document.querySelector('.blog-featured__track-wrapper');
+    if (!wrapper) return;
+
+    const track = wrapper.querySelector('.blog-featured__track');
+    const cards = Array.from(track.querySelectorAll('.blog-featured__card'));
+    if (cards.length === 0) return;
+
+    cards.forEach(c => track.appendChild(c.cloneNode(true)));
+
+    function calcDuration() {
+        const totalWidth = track.scrollWidth / 2;
+        return totalWidth / 60;
+    }
+
+    track.style.animationDuration = calcDuration() + 's';
+    track.classList.add('blog-featured__track--scrolling');
+
+    wrapper.addEventListener('mouseenter', () => track.style.animationPlayState = 'paused');
+    wrapper.addEventListener('mouseleave', () => track.style.animationPlayState = 'running');
+
+    window.addEventListener('resize', () => {
+        track.style.animationDuration = calcDuration() + 's';
+    });
+})();
+
+// ─── Testimonials Carousel (infinite seamless scroll) ───────────────────────
 (function () {
     const wrapper = document.querySelector('.testimonials__track-wrapper');
     if (!wrapper) return;
 
     const track = wrapper.querySelector('.testimonials__track');
     const slides = Array.from(track.querySelectorAll('.testimonials__slide'));
-    const prevBtn = document.querySelector('.testimonials__nav-btn--prev');
-    const nextBtn = document.querySelector('.testimonials__nav-btn--next');
-
     if (slides.length === 0) return;
 
-    let current = 0;
+    slides.forEach(s => track.appendChild(s.cloneNode(true)));
 
-    function isMobile() {
-        return window.innerWidth < 768;
+    function calcDuration() {
+        const totalWidth = track.scrollWidth / 2;
+        return totalWidth / 80;
     }
 
-    function getVisible() {
-        if (window.innerWidth >= 1024) return 3;
-        if (window.innerWidth >= 768) return 2;
-        return 1;
-    }
+    track.style.animationDuration = calcDuration() + 's';
+    track.classList.add('testimonials__track--scrolling');
 
-    function maxIndex() {
-        return Math.max(0, slides.length - getVisible());
-    }
-
-    function scrollMobile(direction) {
-        const card = slides[0];
-        if (!card) return;
-        const distance = card.getBoundingClientRect().width + 20;
-        wrapper.scrollBy({ left: direction * distance, behavior: 'smooth' });
-    }
-
-    function update() {
-        if (isMobile()) {
-            track.style.transform = '';
-            return;
-        }
-        const cardWidth = slides[0].getBoundingClientRect().width;
-        const gap = 20;
-        const offset = current * (cardWidth + gap);
-        track.style.transform = `translateX(-${offset}px)`;
-
-        if (prevBtn) prevBtn.disabled = current === 0;
-        if (nextBtn) nextBtn.disabled = current >= maxIndex();
-    }
-
-    if (prevBtn) {
-        prevBtn.addEventListener('click', () => {
-            if (isMobile()) { scrollMobile(-1); return; }
-            if (current > 0) { current--; update(); }
-        });
-    }
-
-    if (nextBtn) {
-        nextBtn.addEventListener('click', () => {
-            if (isMobile()) { scrollMobile(1); return; }
-            if (current < maxIndex()) { current++; update(); }
-        });
-    }
+    wrapper.addEventListener('mouseenter', () => track.style.animationPlayState = 'paused');
+    wrapper.addEventListener('mouseleave', () => track.style.animationPlayState = 'running');
 
     window.addEventListener('resize', () => {
-        current = Math.min(current, maxIndex());
-        update();
+        track.style.animationDuration = calcDuration() + 's';
     });
-
-    update();
 })();
 
 // ─── Event Countdown Timer ──────────────────────────────────────────────────
@@ -235,6 +323,77 @@ document.querySelectorAll('.video-player, .episode-card, .event-card--has-video'
             });
         });
     }
+})();
+
+// ─── Download Modal ─────────────────────────────────────────────────────────
+(function () {
+    const modal = document.getElementById('downloadModal');
+    if (!modal) return;
+
+    const backdrop = modal.querySelector('.download-modal__backdrop');
+    const closeBtn = modal.querySelector('.download-modal__close');
+
+    function open() {
+        modal.classList.add('is-open');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function close() {
+        modal.classList.remove('is-open');
+        document.body.style.overflow = '';
+    }
+
+    document.querySelectorAll('.js-open-download').forEach(btn => {
+        btn.addEventListener('click', e => {
+            e.preventDefault();
+            open();
+        });
+    });
+
+    if (closeBtn) closeBtn.addEventListener('click', close);
+    if (backdrop) backdrop.addEventListener('click', close);
+
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape' && modal.classList.contains('is-open')) close();
+    });
+})();
+
+// ─── Contact Form (About page) ──────────────────────────────────────────────
+(function () {
+    const form = document.getElementById('contactForm');
+    if (!form) return;
+
+    const msg = document.getElementById('contactMsg');
+    const btn = form.querySelector('.about-contact__submit');
+
+    form.addEventListener('submit', e => {
+        e.preventDefault();
+        btn.disabled = true;
+        btn.textContent = 'Mengirim...';
+        msg.hidden = true;
+
+        const data = new FormData(form);
+        data.append('action', 'lemomo_contact_submit');
+        data.append('nonce', form.querySelector('[name="contact_nonce"]').value);
+
+        fetch(window.lemomo_ajax.url, { method: 'POST', body: data })
+            .then(r => r.json())
+            .then(res => {
+                if (res.success) {
+                    form.reset();
+                    alert('Berhasil terkirim!');
+                } else {
+                    alert(res.data || 'Gagal mengirim, coba lagi.');
+                }
+            })
+            .catch(() => {
+                alert('Terjadi kesalahan jaringan.');
+            })
+            .finally(() => {
+                btn.disabled = false;
+                btn.textContent = 'Kirim';
+            });
+    });
 })();
 
 // ─── Blog Detail: Copy Link ─────────────────────────────────────────────────

@@ -14,7 +14,7 @@ $img_dir = get_template_directory_uri() . '/assets/images';
                 <img src="<?php echo esc_url($img_dir . '/about-payment-logos.svg'); ?>" alt="Payment Partners" class="about-payment__logos-img">
             </div>
             <div class="about-payment__phone">
-                <img src="<?php echo esc_url($img_dir . '/about-payment-phone-56586a.png'); ?>" alt="Lemomo Payment" class="about-payment__phone-img">
+                <?php lemomo_picture($img_dir . '/about-payment-phone-56586a.png', 'Lemomo Payment', 'about-payment__phone-img'); ?>
             </div>
         </div>
     </div>

@@ -22,13 +22,13 @@ $highlight = !empty($all_posts) ? $all_posts[0] : null;
 $grid_posts = array_slice($all_posts, 1);
 ?>
 
-<section class="blog-articles">
+<section class="blog-articles" id="blog-articles">
     <div class="container">
 
         <div class="blog-articles__header">
             <h2 class="blog-articles__title">Artikel lainnya</h2>
             <div class="blog-articles__filters">
-                <a href="<?php echo esc_url(get_permalink(get_option('page_for_posts'))); ?>"
+                <a href="<?php echo esc_url(get_permalink(get_option('page_for_posts')) . '#blog-articles'); ?>"
                    class="blog-articles__filter<?php echo !$current_cat ? ' blog-articles__filter--active' : ''; ?>">
                     Semua
                 </a>
@@ -37,7 +37,7 @@ $grid_posts = array_slice($all_posts, 1);
                     if (!$cat_obj) continue;
                     $is_active = (strtolower($current_cat) === strtolower($cat_obj->slug));
                 ?>
-                <a href="<?php echo esc_url(add_query_arg('cat', $cat_obj->slug)); ?>"
+                <a href="<?php echo esc_url(add_query_arg('cat', $cat_obj->slug) . '#blog-articles'); ?>"
                    class="blog-articles__filter<?php echo $is_active ? ' blog-articles__filter--active' : ''; ?>">
                     <?php echo esc_html($fc); ?>
                 </a>
@@ -105,7 +105,7 @@ $grid_posts = array_slice($all_posts, 1);
         <?php if ($blog_query->max_num_pages > 1) : ?>
         <div class="explore-pagination">
             <?php if ($paged > 1) : ?>
-            <a href="<?php echo esc_url(get_pagenum_link($paged - 1)); ?>" class="explore-pagination__btn" aria-label="Previous page">
+            <a href="<?php echo esc_url(get_pagenum_link($paged - 1) . '#blog-articles'); ?>" class="explore-pagination__btn" aria-label="Previous page">
                 <svg viewBox="0 0 10 10"><polyline points="7 2 3 5 7 8"/></svg>
             </a>
             <?php else : ?>
@@ -120,14 +120,14 @@ $grid_posts = array_slice($all_posts, 1);
                     <span><?php echo $i; ?></span>
                 </span>
                 <?php else : ?>
-                <a href="<?php echo esc_url(get_pagenum_link($i)); ?>" class="explore-pagination__btn" aria-label="Page <?php echo $i; ?>">
+                <a href="<?php echo esc_url(get_pagenum_link($i) . '#blog-articles'); ?>" class="explore-pagination__btn" aria-label="Page <?php echo $i; ?>">
                     <span><?php echo $i; ?></span>
                 </a>
                 <?php endif; ?>
             <?php endfor; ?>
 
             <?php if ($paged < $blog_query->max_num_pages) : ?>
-            <a href="<?php echo esc_url(get_pagenum_link($paged + 1)); ?>" class="explore-pagination__btn" aria-label="Next page">
+            <a href="<?php echo esc_url(get_pagenum_link($paged + 1) . '#blog-articles'); ?>" class="explore-pagination__btn" aria-label="Next page">
                 <svg viewBox="0 0 10 10"><polyline points="3 2 7 5 3 8"/></svg>
             </a>
             <?php else : ?>

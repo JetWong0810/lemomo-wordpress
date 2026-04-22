@@ -14,7 +14,7 @@ $cat_name   = !empty($categories) ? esc_html($categories[0]->name) : 'Update';
             <?php if (has_post_thumbnail()) : ?>
                 <?php the_post_thumbnail('full', ['class' => 'blog-detail__hero-img']); ?>
             <?php else : ?>
-                <img class="blog-detail__hero-img" src="<?php echo esc_url($img_dir . '/blog/blog-thumb-1.png'); ?>" alt="<?php the_title_attribute(); ?>">
+                <?php lemomo_picture($img_dir . '/blog/blog-thumb-1.png', get_the_title(), 'blog-detail__hero-img'); ?>
             <?php endif; ?>
         </div>
 
@@ -70,7 +70,7 @@ $cat_name   = !empty($categories) ? esc_html($categories[0]->name) : 'Update';
                             <?php if (has_post_thumbnail()) : ?>
                                 <?php the_post_thumbnail('medium', ['class' => 'blog-detail__related-card-thumb']); ?>
                             <?php else : ?>
-                                <img class="blog-detail__related-card-thumb" src="<?php echo esc_url($img_dir . '/blog/blog-thumb-1.png'); ?>" alt="<?php the_title_attribute(); ?>">
+                                <?php lemomo_picture($img_dir . '/blog/blog-thumb-1.png', get_the_title(), 'blog-detail__related-card-thumb'); ?>
                             <?php endif; ?>
                             <span class="blog-detail__related-card-tag"><?php echo $rel_cat; ?></span>
                         </div>
@@ -176,7 +176,7 @@ $cat_name   = !empty($categories) ? esc_html($categories[0]->name) : 'Update';
                             <?php if (has_post_thumbnail()) : ?>
                                 <?php the_post_thumbnail('medium_large'); ?>
                             <?php else : ?>
-                                <img src="<?php echo esc_url($img_dir . '/blog/blog-thumb-1.png'); ?>" alt="<?php the_title_attribute(); ?>">
+                                <?php lemomo_picture($img_dir . '/blog/blog-thumb-1.png', get_the_title()); ?>
                             <?php endif; ?>
                             <span class="blog-detail__more-card-tag"><?php echo $m_cat; ?></span>
                         </div>

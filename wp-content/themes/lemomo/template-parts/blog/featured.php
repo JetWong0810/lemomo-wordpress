@@ -1,17 +1,17 @@
 <?php
 /**
- * Blog Featured — 顶部横向滚动卡片（外链媒体报道）
- * 数据来源：后台左侧「媒体报道」CPT（lemomo_media）
+ * Blog Featured — 顶部横向滚动卡片（最新5篇文章）
+ * 数据来源：WordPress 普通文章（post），取最新5条
  */
-$media_query = new WP_Query([
-    'post_type'      => 'lemomo_media',
+$featured_query = new WP_Query([
+    'post_type'      => 'post',
     'post_status'    => 'publish',
-    'posts_per_page' => -1,
-    'orderby'        => 'menu_order date',
+    'posts_per_page' => 5,
+    'orderby'        => 'date',
     'order'          => 'DESC',
 ]);
 
-if (!$media_query->have_posts()) return;
+if (!$featured_query->have_posts()) return;
 ?>
 
 <section class="blog-featured">
@@ -20,22 +20,22 @@ if (!$media_query->have_posts()) return;
     </div>
     <div class="blog-featured__track-wrapper">
         <div class="blog-featured__track">
-            <?php while ($media_query->have_posts()) : $media_query->the_post();
-                $external_url = get_post_meta(get_the_ID(), '_lemomo_media_url', true);
-                $thumb_url    = get_the_post_thumbnail_url(get_the_ID(), 'large');
-                if (!$external_url) continue;
+            <?php while ($featured_query->have_posts()) : $featured_query->the_post();
+                $cats = get_the_category();
+                $cat_name = !empty($cats) ? $cats[0]->name : '';
+                $thumb_url = get_the_post_thumbnail_url(get_the_ID(), 'large');
             ?>
-            <a href="<?php echo esc_url($external_url); ?>"
-               class="blog-featured__card"
-               target="_blank"
-               rel="noopener noreferrer">
+            <a href="<?php the_permalink(); ?>"
+               class="blog-featured__card">
                 <div class="blog-featured__card-img">
                     <?php if ($thumb_url) : ?>
                     <img src="<?php echo esc_url($thumb_url); ?>"
                          alt="<?php the_title_attribute(); ?>"
                          loading="lazy">
                     <?php endif; ?>
-                    <span class="blog-featured__card-tag">Media</span>
+                    <?php if ($cat_name) : ?>
+                    <span class="blog-featured__card-tag"><?php echo esc_html($cat_name); ?></span>
+                    <?php endif; ?>
                 </div>
                 <h3 class="blog-featured__card-title"><?php the_title(); ?></h3>
             </a>

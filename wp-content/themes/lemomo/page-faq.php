@@ -36,29 +36,6 @@ if (empty($categories) && $acf_active) {
         }
     }
 }
-
-// 3. 最终静态兜底
-if (empty($categories)) {
-    $categories = [
-        [
-            'category_name' => 'Tentang Lemomo',
-            'faq_items' => [
-                ['question' => 'Apa itu Lemomo?',                       'answer' => 'Lemomo adalah platform e-commerce berbasis minat di Indonesia yang menghadirkan pengalaman belanja seru melalui konsep blind box, belanja interaktif, dan fitur titip jual 24 jam.', 'answer_html' => ''],
-                ['question' => 'Bagaimana cara membuat akun Lemomo?',   'answer' => 'Anda dapat membuat akun Lemomo dengan mengunduh aplikasi dari Google Play atau App Store, lalu mendaftar menggunakan nomor telepon atau email Anda.',                         'answer_html' => ''],
-                ['question' => 'Apakah Lemomo aman digunakan?',         'answer' => 'Ya, Lemomo menggunakan sistem keamanan berlapis untuk melindungi data dan transaksi pengguna.',                                                                                  'answer_html' => ''],
-                ['question' => 'Kenapa harga di Lemomo bisa lebih murah?', 'answer' => 'Lemomo bekerja sama langsung dengan brand dan supplier untuk memberikan harga terbaik kepada pengguna.',                                                                      'answer_html' => ''],
-                ['question' => 'Lupa kata sandi?',                      'answer' => 'Anda dapat mereset kata sandi melalui halaman login dengan memilih "Lupa Kata Sandi".',                                                                                         'answer_html' => ''],
-            ],
-        ],
-        [
-            'category_name' => 'Transaksi',
-            'faq_items' => [
-                ['question' => 'Bagaimana cara top up saldo?',          'answer' => 'Top up saldo bisa dilakukan melalui berbagai metode pembayaran di aplikasi Lemomo.',      'answer_html' => ''],
-                ['question' => 'Kapan dana withdraw tiba?',             'answer' => 'Penarikan dana akan tiba dalam 24 jam setelah permintaan diajukan.',                      'answer_html' => ''],
-            ],
-        ],
-    ];
-}
 ?>
 
 <main class="site-main page-faq">
@@ -68,14 +45,14 @@ if (empty($categories)) {
             <div class="faq-hero__bg-gradient"></div>
             <div class="faq-hero__bg-texture"></div>
             <div class="faq-hero__bg-overlay"></div>
-            <img src="<?php echo esc_url($img_dir . '/faq/faq-hero-deco.png'); ?>"
-                 alt="" class="faq-hero__bg-deco">
+            <?php lemomo_picture($img_dir . '/faq/faq-hero-deco.png', '', 'faq-hero__bg-deco'); ?>
         </div>
         <div class="container">
             <h1 class="faq-hero__title"><?php echo esc_html($page_title); ?></h1>
         </div>
     </section>
 
+    <?php if (!empty($categories)) : ?>
     <section class="faq-content">
         <div class="container">
 
@@ -137,6 +114,7 @@ if (empty($categories)) {
 
         </div>
     </section>
+    <?php endif; ?>
 
 </main>
 

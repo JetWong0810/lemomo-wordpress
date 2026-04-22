@@ -5,10 +5,17 @@
  */
 $assets = get_template_directory_uri() . '/assets/images/';
 
-$next_event_title = get_field('event_next_title') ?: 'Event Selanjutnya';
+$next_event_title    = get_field('event_next_title') ?: 'Event Selanjutnya';
 $next_event_subtitle = get_field('event_next_subtitle') ?: 'Nantikan keseruan event Lemomo selanjutnya';
-$next_event_date = get_field('event_next_date') ?: '';
-$next_event_label = get_field('event_next_label') ?: 'Hide and Show Event';
+$next_event_label    = get_field('event_next_label') ?: 'Hide and Show Event';
+
+$countdown_datetime = get_field('event_countdown_datetime');
+if ($countdown_datetime) {
+    $countdown_target = date('c', strtotime($countdown_datetime));
+} else {
+    $random_hours = rand(48, 168);
+    $countdown_target = date('c', time() + $random_hours * 3600 + rand(0, 3599));
+}
 ?>
 
 <section class="event-upcoming">
@@ -26,7 +33,7 @@ $next_event_label = get_field('event_next_label') ?: 'Hide and Show Event';
             </div>
 
             <div class="event-upcoming__banner-right">
-                <div class="event-upcoming__countdown" data-target="<?php echo esc_attr($next_event_date); ?>">
+                <div class="event-upcoming__countdown" data-target="<?php echo esc_attr($countdown_target); ?>">
                     <div class="event-upcoming__countdown-icon">
                         <img src="<?php echo esc_url($assets . 'event-countdown-icon.svg'); ?>" alt="">
                     </div>

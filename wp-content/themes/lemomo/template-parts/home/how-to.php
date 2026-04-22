@@ -45,7 +45,7 @@ $steps = get_field('how_to_steps') ?: $default_steps;
                     <img src="<?php echo esc_url($how_to_image['url']); ?>"
                          alt="<?php echo esc_attr($how_to_image['alt']); ?>">
                 <?php else : ?>
-                    <img src="<?php echo esc_url($img_dir . '/howto-phone.png'); ?>" alt="Cara Menggunakan Lemomo">
+                    <?php lemomo_picture($img_dir . '/howto-phone.png', 'Cara Menggunakan Lemomo'); ?>
                 <?php endif; ?>
             </div>
         </div>

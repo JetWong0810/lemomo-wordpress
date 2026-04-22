@@ -11,7 +11,8 @@ $img_dir = get_template_directory_uri() . '/assets/images';
             <p class="about-contact__desc">Isi data diri Anda untuk mendapatkan informasi terbaru dan penawaran spesial dari Lemomo.</p>
         </div>
 
-        <form class="about-contact__form" action="#" method="post">
+        <form class="about-contact__form" id="contactForm" method="post">
+            <?php wp_nonce_field('lemomo_contact_form', 'contact_nonce'); ?>
             <div class="about-contact__form-inner">
                 <img src="<?php echo esc_url($img_dir . '/about-form-bg.svg'); ?>" alt="" class="about-contact__form-bg" aria-hidden="true">
 
@@ -34,6 +35,7 @@ $img_dir = get_template_directory_uri() . '/assets/images';
             </div>
 
             <button type="submit" class="about-contact__submit">Kirim</button>
+            <p class="about-contact__msg" id="contactMsg" hidden></p>
         </form>
     </div>
 </section>

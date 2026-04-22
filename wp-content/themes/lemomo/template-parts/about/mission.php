@@ -5,7 +5,7 @@ $img_dir = get_template_directory_uri() . '/assets/images';
 ?>
 
 <section class="about-mission">
-    <div class="about-mission__bg-pattern" aria-hidden="true"></div>
+    <?php lemomo_picture($img_dir . '/about-mission-dots-bg.png', '', 'about-mission__bg-pattern', 'aria-hidden="true"'); ?>
 
     <div class="container about-mission__inner">
         <h2 class="about-mission__title"><?php echo nl2br(esc_html($title)); ?></h2>
@@ -16,7 +16,7 @@ $img_dir = get_template_directory_uri() . '/assets/images';
         <div class="about-mission__product">
             <img src="<?php echo esc_url($img_dir . '/about-brand-left-shape.svg'); ?>" alt="" class="about-mission__product-shape about-mission__product-shape--purple" aria-hidden="true">
             <img src="<?php echo esc_url($img_dir . '/about-brand-left-shape2.svg'); ?>" alt="" class="about-mission__product-shape about-mission__product-shape--orange" aria-hidden="true">
-            <img src="<?php echo esc_url($img_dir . '/about-brand-left.png'); ?>" alt="Lemomo Blind Box" class="about-mission__product-img">
+            <?php lemomo_picture($img_dir . '/about-brand-left.png', 'Lemomo Blind Box', 'about-mission__product-img'); ?>
         </div>
 
         <div class="about-mission__visi-misi">

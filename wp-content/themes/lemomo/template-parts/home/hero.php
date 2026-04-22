@@ -10,7 +10,7 @@ $img_dir  = get_template_directory_uri() . '/assets/images';
 <section class="hero">
     <div class="hero__bg">
         <div class="hero__bg-gradient"></div>
-        <img src="<?php echo esc_url($img_dir . '/hero-bg-texture-56586a.png'); ?>" alt="" class="hero__bg-texture" aria-hidden="true">
+        <?php lemomo_picture($img_dir . '/hero-bg-texture-56586a.png', '', 'hero__bg-texture', 'aria-hidden="true"'); ?>
         <div class="hero__bg-overlay"></div>
     </div>
 
@@ -21,15 +21,14 @@ $img_dir  = get_template_directory_uri() . '/assets/images';
                      alt="<?php echo esc_attr($hero_image['alt']); ?>"
                      class="hero__img">
             <?php else : ?>
-                <img src="<?php echo esc_url($img_dir . '/hero-phones-399c27.png'); ?>"
-                     alt="Lemomo App" class="hero__img">
+                <?php lemomo_picture($img_dir . '/hero-phones-399c27.png', 'Lemomo App', 'hero__img'); ?>
             <?php endif; ?>
         </div>
 
         <div class="hero__content">
             <p class="hero__subtitle"><?php echo esc_html($subtitle); ?></p>
             <h1 class="hero__title"><?php echo wp_kses($title, ['br' => []]); ?></h1>
-            <a href="<?php echo esc_url($cta_link); ?>" class="btn-cta">
+            <a href="#" class="btn-cta js-open-download">
                 <?php echo esc_html($cta_text); ?>
             </a>
         </div>

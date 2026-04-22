@@ -29,12 +29,12 @@ $cta_link = get_field('header_cta_link', 'option') ?: '#';
                 'fallback_cb'    => false,
             ]);
             ?>
-            <a href="<?php echo esc_url($cta_link); ?>" class="btn-download btn-download--mobile">
+            <a href="#" class="btn-download btn-download--mobile js-open-download">
                 <?php echo esc_html($cta_text); ?>
             </a>
         </nav>
 
-        <a href="<?php echo esc_url($cta_link); ?>" class="btn-download">
+        <a href="#" class="btn-download js-open-download">
             <?php echo esc_html($cta_text); ?>
         </a>
 

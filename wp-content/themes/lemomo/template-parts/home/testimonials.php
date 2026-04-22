@@ -2,40 +2,8 @@
 $title = get_field('testimonials_title') ?: 'Kata Mereka Tentang Lemomo';
 $img_dir = get_template_directory_uri() . '/assets/images';
 
-$default_testimonials = [
-    [
-        'testimonial_text'   => 'Awalnya coba karena blind box, eh malah bisa dapat cuan. Ngga cocok? Simple tinggal pakai fitur titip jual, saldo bisa balik lagi deh!',
-        'testimonial_name'   => 'Ningina',
-        'testimonial_rating' => 5,
-    ],
-    [
-        'testimonial_text'   => 'Proses daftar & beli blind box di Lemomo super gampang, semua transaksinya transparan. Jadi mainnya berasa aman!',
-        'testimonial_name'   => 'Nouval',
-        'testimonial_rating' => 5,
-    ],
-    [
-        'testimonial_text'   => 'Aku paling suka sama fitur emas gratis, setiap hari tukeran dan ajak teman itu gampang bisa langsung bonus.',
-        'testimonial_name'   => 'Kokam',
-        'testimonial_rating' => 5,
-    ],
-    [
-        'testimonial_text'   => 'Fitur titip jual 24 jam sangat membantu, bisa langsung jual barang yang tidak diinginkan tanpa repot!',
-        'testimonial_name'   => 'Dewi',
-        'testimonial_rating' => 5,
-    ],
-    [
-        'testimonial_text'   => 'Seru banget buka blind box di Lemomo, hadiahnya beneran premium. Sudah beberapa kali dapat barang bagus!',
-        'testimonial_name'   => 'Rian',
-        'testimonial_rating' => 5,
-    ],
-    [
-        'testimonial_text'   => 'Aplikasi paling inovatif yang pernah saya coba. Konsep blind box dengan e-commerce ini unik dan bikin ketagihan.',
-        'testimonial_name'   => 'Sari',
-        'testimonial_rating' => 5,
-    ],
-];
-
-$testimonials = get_field('testimonials_list') ?: $default_testimonials;
+$testimonials = get_field('testimonials_list') ?: [];
+if (empty($testimonials)) return;
 ?>
 
 <section class="testimonials">
@@ -74,9 +42,15 @@ $testimonials = get_field('testimonials_list') ?: $default_testimonials;
                             <p class="testimonials__card-text"><?php echo esc_html($item['testimonial_text']); ?></p>
                         </div>
                         <div class="testimonials__card-author">
-                            <div class="testimonials__avatar">
-                                <?php echo esc_html(mb_substr($item['testimonial_name'], 0, 1)); ?>
-                            </div>
+                            <?php if (!empty($item['testimonial_avatar'])) : ?>
+                                <img src="<?php echo esc_url($item['testimonial_avatar']); ?>"
+                                     alt="<?php echo esc_attr($item['testimonial_name']); ?>"
+                                     class="testimonials__avatar testimonials__avatar--img">
+                            <?php else : ?>
+                                <div class="testimonials__avatar">
+                                    <?php echo esc_html(mb_substr($item['testimonial_name'], 0, 1)); ?>
+                                </div>
+                            <?php endif; ?>
                             <span class="testimonials__card-name"><?php echo esc_html($item['testimonial_name']); ?></span>
                         </div>
                     </div>

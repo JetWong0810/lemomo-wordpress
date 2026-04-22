@@ -1,14 +1,19 @@
 <?php
 /**
  * Event Hero Section
- * 合成背景图（渐变+纹理+产品图）+ 标题
+ * 分层背景：渐变底色 → 半透明纹理 → 盒子图片 + 标题
  */
 $assets = get_template_directory_uri() . '/assets/images/';
 ?>
 
 <section class="event-hero">
-    <img src="<?php echo esc_url($assets . 'event-hero-composite.png'); ?>"
-         alt="" class="event-hero__bg-img" aria-hidden="true">
+    <div class="event-hero__bg-gradient" aria-hidden="true"></div>
+    <?php lemomo_picture($assets . 'event-hero-bg-texture.jpg', '', 'event-hero__bg-texture', 'aria-hidden="true"'); ?>
+
+    <div class="event-hero__boxes" aria-hidden="true">
+        <?php lemomo_picture($assets . 'event-hero-boxes-back.png', '', 'event-hero__boxes-back'); ?>
+        <?php lemomo_picture($assets . 'event-hero-boxes-front.png', '', 'event-hero__boxes-front'); ?>
+    </div>
 
     <div class="event-hero__content">
         <h1 class="event-hero__title">

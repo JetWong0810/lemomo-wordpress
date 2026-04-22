@@ -50,26 +50,9 @@ if (empty($events)) {
         }
     }
 }
-
-// ── 3. 最终兜底静态数据 ──
-if (empty($events)) {
-    $static = [
-        ['title' => 'Foto Ramadan Challenge',   'date' => '20 Februari – 30 Maret 2026', 'location' => 'Online',                          'desc' => 'Campaign media sosial mengajak peserta berbagi momen Ramadan dan berhadiah menarik seperti liburan, emas, dan merchandise eksklusif.', 'image' => 'event-card1-56586a.png', 'type' => 'online'],
-        ['title' => 'Foto Ramadan Challenge',   'date' => '20 Februari – 30 Maret 2026', 'location' => 'Online',                          'desc' => 'Campaign media sosial mengajak peserta berbagi momen Ramadan dan berhadiah menarik seperti liburan, emas, dan merchandise eksklusif.', 'image' => 'event-card4-56586a.png', 'type' => 'online'],
-        ['title' => 'Foto Ramadan Challenge',   'date' => '20 Februari – 30 Maret 2026', 'location' => 'Online',                          'desc' => 'Campaign media sosial mengajak peserta berbagi momen Ramadan dan berhadiah menarik seperti liburan, emas, dan merchandise eksklusif.', 'image' => 'event-card7-56586a.png', 'type' => 'online'],
-        ['title' => 'Foto Ramadan Challenge',   'date' => '20 Februari – 30 Maret 2026', 'location' => 'Online',                          'desc' => 'Campaign media sosial mengajak peserta berbagi momen Ramadan dan berhadiah menarik seperti liburan, emas, dan merchandise eksklusif.', 'image' => 'event-card2-56586a.png', 'type' => 'online'],
-        ['title' => 'CFD Bareng Lemomo',        'date' => '28 Desember 2025',            'location' => 'Jakarta Pusat',                   'desc' => 'Aktivasi di area Car Free Day dengan mengajak audiens mencoba Blind Box Lemomo dan membagikan hadiah emas secara langsung.',           'image' => 'event-card5.png',        'type' => 'offline'],
-        ['title' => 'Perempuan Berlari',        'date' => '30 November 2025',            'location' => 'Senayan Park Jakarta',            'desc' => 'Event lari khusus perempuan dengan aktivitas seru, merchandise eksklusif, dan hadiah emas dari Lemomo.',                                'image' => 'event-card8-56586a.png', 'type' => 'offline'],
-        ['title' => 'Run For Humanity',         'date' => '23 November 2026',            'location' => 'Lapangan Sunburst - BSD City',    'desc' => '',                                                                                                                                     'image' => 'event-card3-56586a.png', 'type' => 'offline'],
-        ['title' => 'Satu Padel Tournament',    'date' => '',                            'location' => 'TRT Padel and Tennis Court Bintaro', 'desc' => 'Kolaborasi pada ajang padel bergengsi yang diikuti selebriti dan influencer.',                                                    'image' => 'event-card6-56586a.png', 'type' => 'offline'],
-    ];
-    foreach ($static as $s) {
-        $s['is_url'] = false;
-        $events[]    = $s;
-    }
-}
 ?>
 
+<?php if (!empty($events)) : ?>
 <section class="event-grid">
     <img src="<?php echo esc_url($assets . 'event-bg-wave.svg'); ?>"
          alt="" class="event-grid__bg-wave" aria-hidden="true">
@@ -129,3 +112,4 @@ if (empty($events)) {
     </div>
 
 </section>
+<?php endif; ?>

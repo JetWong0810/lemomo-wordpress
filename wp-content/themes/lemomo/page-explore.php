@@ -6,7 +6,7 @@ get_header();
 
 $acf_active = function_exists('get_field');
 $theme_uri  = get_template_directory_uri();
-$demo_thumb = $theme_uri . '/assets/images/explore-thumb.png';
+$demo_thumb = $theme_uri . '/assets/images/explore-thumb.webp';
 
 $page_title    = $acf_active ? (get_field('explore_title') ?: 'Explore  Lemomo') : 'Explore  Lemomo';
 $page_subtitle = $acf_active ? get_field('explore_subtitle') : '';
@@ -25,18 +25,6 @@ if (!$page_subtitle) {
     $page_subtitle = 'Jelajahi Lemomo melalui video panduan dan temukan cara mudah menikmati semua fiturnya.';
 }
 
-if (empty($episodes)) {
-    for ($i = 0; $i < 6; $i++) {
-        $episodes[] = [
-            'title'          => 'Tutorial: Download dan Daftar Akun Baru',
-            'thumbnail'      => $demo_thumb,
-            'video_url'      => '#',
-            'episode_number' => $i + 1,
-            'view_count'     => '',
-        ];
-    }
-    $ep_total_pages = 1;
-}
 ?>
 
 <main class="site-main page-explore">
@@ -52,26 +40,25 @@ if (empty($episodes)) {
         </div>
     </section>
 
+    <?php if (!empty($episodes) || $main_video) :
+    $first_ep_video = (!empty($episodes[0]['video_url'])) ? $episodes[0]['video_url'] : $main_video;
+    $first_ep_thumb = (!empty($episodes[0]['thumbnail'])) ? $episodes[0]['thumbnail'] : ($main_thumb ? $main_thumb['url'] : $demo_thumb);
+    ?>
     <section class="explore-main-video">
         <div class="container">
-            <div class="video-player"
-                 data-video="<?php echo esc_url($main_video); ?>"
-                 role="button"
-                 tabindex="0"
-                 aria-label="Play main video">
-                <?php if ($main_thumb) : ?>
-                    <img src="<?php echo esc_url($main_thumb['url']); ?>"
-                         alt="<?php echo esc_attr($main_thumb['alt']); ?>"
-                         class="video-player__thumb">
-                <?php else : ?>
-                    <img src="<?php echo esc_url($demo_thumb); ?>"
+            <div class="explore-player" id="explorePlayer"
+                 data-video="<?php echo esc_url($first_ep_video); ?>"
+                 data-thumb="<?php echo esc_url($first_ep_thumb); ?>">
+                <div class="explore-player__container">
+                    <img src="<?php echo esc_url($first_ep_thumb); ?>"
                          alt="Explore Lemomo"
-                         class="video-player__thumb">
-                <?php endif; ?>
-                <span class="video-player__play-btn" aria-hidden="true">&#9654; PLAY</span>
+                         class="explore-player__thumb">
+                    <span class="explore-player__play-btn" aria-hidden="true">&#9654; PLAY</span>
+                </div>
             </div>
         </div>
     </section>
+    <?php endif; ?>
 
     <?php if (!empty($episodes)) : ?>
     <section class="explore-episodes">
