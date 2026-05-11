@@ -48,7 +48,10 @@ if (empty($categories) && $acf_active) {
             <?php lemomo_picture($img_dir . '/faq/faq-hero-deco.png', '', 'faq-hero__bg-deco'); ?>
         </div>
         <div class="container">
-            <h1 class="faq-hero__title"><?php echo esc_html($page_title); ?></h1>
+            <div class="faq-hero__text">
+                <span class="faq-hero__label">F.A.Q</span>
+                <h1 class="faq-hero__title"><?php echo esc_html($page_title); ?></h1>
+            </div>
         </div>
     </section>
 

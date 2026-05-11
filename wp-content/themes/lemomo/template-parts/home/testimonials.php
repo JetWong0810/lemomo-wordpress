@@ -2,7 +2,18 @@
 $title = get_field('testimonials_title') ?: 'Kata Mereka Tentang Lemomo';
 $img_dir = get_template_directory_uri() . '/assets/images';
 
-$testimonials = get_field('testimonials_list') ?: [];
+$testimonials = get_field('testimonials_list');
+if (!is_array($testimonials)) {
+    $count = intval(get_post_meta(get_the_ID(), 'testimonials_list', true));
+    $testimonials = [];
+    for ($i = 0; $i < $count; $i++) {
+        $testimonials[] = [
+            'testimonial_name'   => get_post_meta(get_the_ID(), "testimonials_list_{$i}_testimonial_name", true),
+            'testimonial_avatar' => get_post_meta(get_the_ID(), "testimonials_list_{$i}_testimonial_avatar", true),
+            'testimonial_text'   => get_post_meta(get_the_ID(), "testimonials_list_{$i}_testimonial_text", true),
+        ];
+    }
+}
 if (empty($testimonials)) return;
 ?>
 

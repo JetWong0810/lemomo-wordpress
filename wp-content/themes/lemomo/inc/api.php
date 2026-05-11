@@ -220,8 +220,19 @@ function lemomo_get_faq_articles(): array {
         ];
     }
 
-    $result = array_values($grouped);
-    return $result;
+    $ordered = [];
+    foreach (array_keys($cat_map) as $cat_id) {
+        if (isset($grouped[$cat_id])) {
+            $ordered[] = $grouped[$cat_id];
+        }
+    }
+    foreach ($grouped as $cat_id => $group) {
+        if (!isset($cat_map[$cat_id])) {
+            $ordered[] = $group;
+        }
+    }
+
+    return $ordered;
 }
 
 // ─── 缓存清理（已移除 Transient 缓存，保留函数供 AJAX hook 兼容） ────────────

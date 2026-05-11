@@ -44,6 +44,47 @@
     });
 })();
 
+// ─── How-To Step Switching ───────────────────────────────────────────────────
+(function () {
+    const steps = document.querySelectorAll('[data-howto-step]');
+    if (!steps.length) return;
+
+    const imgs = document.querySelectorAll('[data-howto-img]');
+
+    steps.forEach(step => {
+        step.addEventListener('click', () => {
+            const idx = step.dataset.howtoStep;
+
+            steps.forEach(s => {
+                const isActive = s.dataset.howtoStep === idx;
+                s.classList.toggle('how-to__step--active', isActive);
+                const path = s.querySelector('svg path');
+                const text = s.querySelector('svg text');
+                if (path) {
+                    if (isActive) {
+                        path.setAttribute('fill', '#9A3A96');
+                        path.removeAttribute('stroke');
+                        path.removeAttribute('stroke-width');
+                        path.removeAttribute('stroke-miterlimit');
+                    } else {
+                        path.setAttribute('fill', 'white');
+                        path.setAttribute('stroke', '#9A3A96');
+                        path.setAttribute('stroke-width', '2');
+                        path.setAttribute('stroke-miterlimit', '10');
+                    }
+                }
+                if (text) {
+                    text.setAttribute('fill', isActive ? 'white' : '#2D0D30');
+                }
+            });
+
+            imgs.forEach(img => {
+                img.classList.toggle('how-to__media-item--active', img.dataset.howtoImg === idx);
+            });
+        });
+    });
+})();
+
 // ─── Explore Page: Main Player + Episode Cards ─────────────────────────────
 (function () {
     const player = document.getElementById('explorePlayer');

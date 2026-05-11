@@ -515,6 +515,7 @@ address {
     gap: 16px;
     position: relative;
     min-height: 110px;
+    cursor: pointer;
 
     &::before {
       content: "";
@@ -570,10 +571,19 @@ address {
     flex: 0 0 40%;
     display: flex;
     justify-content: center;
+    position: relative;
 
     img {
       max-width: 400px;
       width: 100%;
+    }
+  }
+
+  &__media-item {
+    display: none;
+
+    &--active {
+      display: block;
     }
   }
 }
@@ -1233,13 +1243,29 @@ address {
   }
 
   &__social-icons {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  &__social-link {
+    display: block;
+    width: 20px;
     height: 20px;
-    width: auto;
-    opacity: 0.6;
-    transition: opacity $transition;
+    border-radius: 50%;
+    opacity: 0.5;
+    transition: opacity $transition, transform $transition;
 
     &:hover {
       opacity: 1;
+      transform: scale(1.15);
+    }
+
+    img, picture {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      display: block;
     }
   }
 
@@ -1430,10 +1456,10 @@ address {
     z-index: 0;
 
     &--purple {
-      width: 52%;
-      top: 50%;
-      left: 50%;
-      transform: translate(-30%, -55%);
+      width: 45%;
+      top: -7%;
+      left: 35%;
+      transform: translate(-10%, -5%);
     }
 
     &--orange {
@@ -1945,7 +1971,7 @@ address {
     height: 100%;
     object-fit: cover;
     z-index: 1;
-    opacity: 0.1;
+    opacity: 1;
   }
 
   &__boxes {
@@ -1983,7 +2009,7 @@ address {
     align-items: center;
     justify-content: flex-end;
     height: 100%;
-    padding: 0 calc((100% - 1500px) / 2) 115px 0;
+    padding: 0 8% 115px 0;
   }
 
   &__title {
@@ -2843,15 +2869,26 @@ $gradient-blog-filter-active: linear-gradient(
     padding-right: calc((100% - #{$container-max}) / 2 + 24px);
   }
 
+  &__text {
+    margin-right: 8%;
+    margin-bottom: 120px;
+  }
+
+  &__label {
+    font-family: $font-primary;
+    font-weight: 400;
+    font-size: 40px;
+    line-height: 1.2;
+    color: $color-white;
+    margin-bottom: 8px;
+  }
+
   &__title {
     font-family: $font-primary;
     font-weight: 700;
     font-size: 55px;
     line-height: 1.2;
     color: $color-white;
-    text-align: center;
-    margin-right: 8%;
-    margin-bottom: 120px;
   }
 }
 

@@ -69,7 +69,29 @@ $img_dir   = get_template_directory_uri() . '/assets/images';
         <div class="footer-bottom">
             <div class="footer-bottom__social">
                 <span class="footer-bottom__social-label">Ikuti Kami:</span>
-                <img src="<?php echo esc_url($img_dir . '/social-icons.svg'); ?>" alt="Social Media" class="footer-bottom__social-icons">
+                <div class="footer-bottom__social-icons">
+                    <a href="https://www.threads.com/@lemomo.id" target="_blank" rel="noopener noreferrer" class="footer-bottom__social-link" aria-label="Threads">
+                        <?php lemomo_picture($img_dir . '/social-threads.png', 'Threads'); ?>
+                    </a>
+                    <a href="https://x.com/LemomoID" target="_blank" rel="noopener noreferrer" class="footer-bottom__social-link" aria-label="X">
+                        <?php lemomo_picture($img_dir . '/social-x.png', 'X'); ?>
+                    </a>
+                    <a href="https://www.instagram.com/lemomo.id/" target="_blank" rel="noopener noreferrer" class="footer-bottom__social-link" aria-label="Instagram">
+                        <?php lemomo_picture($img_dir . '/social-instagram.png', 'Instagram'); ?>
+                    </a>
+                    <a href="https://www.tiktok.com/@lemomo_id" target="_blank" rel="noopener noreferrer" class="footer-bottom__social-link" aria-label="TikTok">
+                        <?php lemomo_picture($img_dir . '/social-tiktok.png', 'TikTok'); ?>
+                    </a>
+                    <a href="https://www.youtube.com/@LemomoIndonesiaOfficial" target="_blank" rel="noopener noreferrer" class="footer-bottom__social-link" aria-label="YouTube">
+                        <?php lemomo_picture($img_dir . '/social-youtube.png', 'YouTube'); ?>
+                    </a>
+                    <a href="https://www.facebook.com/lemomo.official/" target="_blank" rel="noopener noreferrer" class="footer-bottom__social-link" aria-label="Facebook">
+                        <?php lemomo_picture($img_dir . '/social-facebook.png', 'Facebook'); ?>
+                    </a>
+                    <a href="https://www.linkedin.com/company/lemomo/" target="_blank" rel="noopener noreferrer" class="footer-bottom__social-link" aria-label="LinkedIn">
+                        <?php lemomo_picture($img_dir . '/social-linkedin.png', 'LinkedIn'); ?>
+                    </a>
+                </div>
             </div>
             <p class="footer-bottom__copyright"><?php echo esc_html($copyright); ?></p>
         </div>

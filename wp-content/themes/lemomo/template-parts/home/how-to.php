@@ -1,6 +1,5 @@
 <?php
 $title = get_field('how_to_title') ?: 'Cara Menggunakan Lemomo';
-$how_to_image = get_field('how_to_image');
 $img_dir = get_template_directory_uri() . '/assets/images';
 
 $default_steps = [
@@ -11,6 +10,14 @@ $default_steps = [
     ['step_title' => 'Dapat Untung!',           'step_description' => 'Nikmati bonus hingga keuntungan dari hasil titip jual'],
 ];
 $steps = get_field('how_to_steps') ?: $default_steps;
+
+$step_images = [
+    $img_dir . '/howto-phone.png',
+    $img_dir . '/howto-step2.png',
+    $img_dir . '/howto-step3.png',
+    $img_dir . '/howto-step4.png',
+    $img_dir . '/howto-step5.png',
+];
 ?>
 
 <section class="how-to">
@@ -23,7 +30,7 @@ $steps = get_field('how_to_steps') ?: $default_steps;
         <div class="how-to__body">
             <ol class="how-to__steps">
                 <?php foreach ($steps as $i => $step) : ?>
-                    <li class="how-to__step<?php echo $i === 0 ? ' how-to__step--active' : ''; ?>">
+                    <li class="how-to__step<?php echo $i === 0 ? ' how-to__step--active' : ''; ?>" data-howto-step="<?php echo $i; ?>">
                         <div class="how-to__step-num">
                             <svg width="35" height="30" viewBox="0 0 35 30" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M23.05 0H11.93C10.01 0 8.24 1.02 7.28 2.68L1.72 12.32C0.76 13.98 0.76 16.03 1.72 17.69L7.28 27.32C8.24 28.98 10.01 30 11.93 30H23.05C24.97 30 26.74 28.98 27.7 27.32L33.26 17.69C34.22 16.03 34.22 13.98 33.26 12.32L27.7 2.69C26.74 1.03 24.97 0.01 23.05 0.01V0Z"
@@ -41,12 +48,11 @@ $steps = get_field('how_to_steps') ?: $default_steps;
             </ol>
 
             <div class="how-to__media">
-                <?php if ($how_to_image) : ?>
-                    <img src="<?php echo esc_url($how_to_image['url']); ?>"
-                         alt="<?php echo esc_attr($how_to_image['alt']); ?>">
-                <?php else : ?>
-                    <?php lemomo_picture($img_dir . '/howto-phone.png', 'Cara Menggunakan Lemomo'); ?>
-                <?php endif; ?>
+                <?php foreach ($step_images as $i => $img_src) : ?>
+                    <div class="how-to__media-item<?php echo $i === 0 ? ' how-to__media-item--active' : ''; ?>" data-howto-img="<?php echo $i; ?>">
+                        <?php lemomo_picture($img_src, 'Cara Menggunakan Lemomo - Step ' . ($i + 1)); ?>
+                    </div>
+                <?php endforeach; ?>
             </div>
         </div>
 

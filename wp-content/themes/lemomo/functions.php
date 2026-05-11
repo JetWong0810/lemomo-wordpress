@@ -285,6 +285,62 @@ add_action('acf/include_fields', function () {
     ]);
 });
 
+// ─── ACF Testimonials Field Group ────────────────────────────────────────────
+add_action('acf/include_fields', function () {
+    if (!function_exists('acf_add_local_field_group')) return;
+
+    acf_add_local_field_group([
+        'key'    => 'group_home_testimonials',
+        'title'  => 'Home Testimonials',
+        'fields' => [
+            [
+                'key'           => 'field_testimonials_title',
+                'label'         => '标题',
+                'name'          => 'testimonials_title',
+                'type'          => 'text',
+                'default_value' => 'Kata Mereka Tentang Lemomo',
+            ],
+            [
+                'key'        => 'field_testimonials_list',
+                'label'      => '评论列表',
+                'name'       => 'testimonials_list',
+                'type'       => 'repeater',
+                'layout'     => 'block',
+                'sub_fields' => [
+                    [
+                        'key'   => 'field_testimonial_name',
+                        'label' => '姓名',
+                        'name'  => 'testimonial_name',
+                        'type'  => 'text',
+                    ],
+                    [
+                        'key'   => 'field_testimonial_avatar',
+                        'label' => '头像 URL',
+                        'name'  => 'testimonial_avatar',
+                        'type'  => 'url',
+                    ],
+                    [
+                        'key'   => 'field_testimonial_text',
+                        'label' => '评价内容',
+                        'name'  => 'testimonial_text',
+                        'type'  => 'textarea',
+                        'rows'  => 3,
+                    ],
+                ],
+            ],
+        ],
+        'location' => [
+            [
+                [
+                    'param'    => 'page',
+                    'operator' => '==',
+                    'value'    => lemomo_get_page_id_by_slug('home'),
+                ],
+            ],
+        ],
+    ]);
+});
+
 // ─── ACF API Settings Fields ─────────────────────────────────────────────────
 add_action('acf/include_fields', function () {
     if (!function_exists('acf_add_local_field_group')) return;
